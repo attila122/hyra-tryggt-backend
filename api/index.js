@@ -9,25 +9,19 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
-require('dotenv').config();
 
-console.log('Starting Hyra Tryggt server...');
-
+// Initialize Express app
 const app = express();
-const prisma = new PrismaClient();
 
-// Serve static files AFTER app is declared
-app.use(express.static('public'));
-
-// Production environment check
-const isProduction = process.env.NODE_ENV === 'production';
-const PORT = process.env.PORT || 3000;
-
-// Create uploads directory if it doesn't exist (for local development)
-const uploadsDir = path.join(__dirname, 'uploads', 'properties');
-if (!isProduction && !fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// Initialize Prisma
+let prisma;
+if (!global.prisma) {
+  global.prisma = new PrismaClient();
 }
+prisma = global.prisma;
+
+// Environment check
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Configure email transporter
 let emailTransporter = null;
@@ -39,9 +33,6 @@ if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       pass: process.env.EMAIL_PASS
     }
   });
-  console.log('✅ Email notifications enabled');
-} else {
-  console.log('⚠️ Email not configured - add EMAIL_USER and EMAIL_PASS for notifications');
 }
 
 // Send email notification
@@ -64,38 +55,26 @@ async function sendEmail(to, subject, html) {
   }
 }
 
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${uuidv4()}-${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only image files are allowed!'), false);
-  }
-};
-
+// Configure multer for image uploads (simplified for serverless)
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
     files: 10 // Maximum 10 files
   }
 });
 
-// Rate limiting - more lenient in production
+// Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isProduction ? 200 : 100,
+  max: 200,
   message: { error: 'Too many requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false
@@ -107,22 +86,9 @@ const authLimiter = rateLimit({
   message: { error: 'Too many login attempts, please try again later' }
 });
 
-// Middleware
-app.use(limiter);
-
-// CORS configuration for production
-const allowedOrigins = [
-  'https://hyratryggt.se',
-  'https://www.hyratryggt.se',
-  'https://hyra-tryggt-backend-z5kb.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:8080',
-  'null',
-  process.env.NEXT_PUBLIC_API_URL
-].filter(Boolean);
-
+// CORS configuration
 app.use(cors({
-  origin: isProduction ? allowedOrigins : true,
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -130,14 +96,7 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-
-// Serve uploaded images statically
-if (!isProduction) {
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-} else {
-  // In production, you might want to use cloud storage
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-}
+app.use(limiter);
 
 // Input validation helpers
 const validateEmail = (email) => {
@@ -173,14 +132,11 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-console.log('Express app created');
-
 // Root endpoint
 app.get('/', (req, res) => {
-  console.log('GET / called');
   res.json({ 
     message: 'Hyra Tryggt API is running!',
-    version: '2.0.0',
+    version: '3.0.0',
     environment: isProduction ? 'production' : 'development',
     features: {
       authentication: true,
@@ -198,9 +154,18 @@ app.get('/', (req, res) => {
   });
 });
 
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: isProduction ? 'production' : 'development',
+    emailConfigured: !!emailTransporter
+  });
+});
+
 // Register new user
 app.post('/register', authLimiter, async (req, res) => {
-  console.log('POST /register called');
   try {
     const { email, password, name, phone } = req.body;
     
@@ -257,7 +222,6 @@ app.post('/register', authLimiter, async (req, res) => {
 
 // Login user
 app.post('/login', authLimiter, async (req, res) => {
-  console.log('POST /login called');
   try {
     const { email, password } = req.body;
     
@@ -332,9 +296,8 @@ app.get('/profile', authenticateToken, async (req, res) => {
   }
 });
 
-// Create property (protected route)
+// Create property
 app.post('/properties', authenticateToken, async (req, res) => {
-  console.log('POST /properties called');
   try {
     const { title, description, address, city, rent, rooms, size, availableFrom } = req.body;
     
@@ -375,472 +338,14 @@ app.post('/properties', authenticateToken, async (req, res) => {
   }
 });
 
-// Apply for a property
-app.post('/properties/:id/apply', authenticateToken, async (req, res) => {
-  try {
-    const propertyId = parseInt(req.params.id);
-    const { message } = req.body;
-    
-    // Check if property exists and is available
-    const property = await prisma.property.findUnique({
-      where: { id: propertyId },
-      include: { landlord: true }
-    });
-    
-    if (!property) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-    
-    if (!property.isAvailable) {
-      return res.status(400).json({ error: 'Property is no longer available' });
-    }
-    
-    // Check if user is not the landlord
-    if (property.landlordId === req.user.userId) {
-      return res.status(400).json({ error: 'You cannot apply to your own property' });
-    }
-    
-    // Check if user has already applied
-    const existingApplication = await prisma.application.findUnique({
-      where: {
-        userId_propertyId: {
-          userId: req.user.userId,
-          propertyId: propertyId
-        }
-      }
-    });
-    
-    if (existingApplication) {
-      return res.status(409).json({ error: 'You have already applied to this property' });
-    }
-    
-    // Get applicant details
-    const applicant = await prisma.user.findUnique({
-      where: { id: req.user.userId }
-    });
-    
-    // Create application
-    const application = await prisma.application.create({
-      data: {
-        userId: req.user.userId,
-        propertyId: propertyId,
-        message: message || null,
-        status: 'PENDING'
-      },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true, phone: true }
-        },
-        property: {
-          select: { id: true, title: true, address: true, city: true, rent: true }
-        }
-      }
-    });
-    
-    // Send email notification to landlord
-    const emailSubject = `New Application for ${property.title}`;
-    const emailHtml = `
-      <h2>🏠 New Property Application</h2>
-      <p>You have received a new application for your property:</p>
-      
-      <h3>Property Details:</h3>
-      <ul>
-        <li><strong>Title:</strong> ${property.title}</li>
-        <li><strong>Address:</strong> ${property.address}, ${property.city}</li>
-        <li><strong>Rent:</strong> ${property.rent.toLocaleString()} SEK/month</li>
-      </ul>
-      
-      <h3>Applicant Details:</h3>
-      <ul>
-        <li><strong>Name:</strong> ${applicant.name}</li>
-        <li><strong>Email:</strong> ${applicant.email}</li>
-        ${applicant.phone ? `<li><strong>Phone:</strong> ${applicant.phone}</li>` : ''}
-      </ul>
-      
-      ${message ? `
-        <h3>Application Message:</h3>
-        <p style="background: #f5f5f5; padding: 15px; border-radius: 5px;">${message}</p>
-      ` : ''}
-      
-      <p>Please log in to your Hyra Tryggt account to manage this application.</p>
-      <p><em>This is an automated message from Hyra Tryggt.</em></p>
-    `;
-    
-    await sendEmail(property.landlord.email, emailSubject, emailHtml);
-    
-    res.status(201).json({
-      message: 'Application submitted successfully',
-      application
-    });
-    
-  } catch (error) {
-    console.error('Application error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Get applications for a property (landlord only)
-app.get('/properties/:id/applications', authenticateToken, async (req, res) => {
-  try {
-    const propertyId = parseInt(req.params.id);
-    
-    // Check if property belongs to user
-    const property = await prisma.property.findFirst({
-      where: { id: propertyId, landlordId: req.user.userId }
-    });
-    
-    if (!property) {
-      return res.status(404).json({ error: 'Property not found or not authorized' });
-    }
-    
-    const applications = await prisma.application.findMany({
-      where: { propertyId },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true, phone: true, createdAt: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-    
-    res.json(applications);
-  } catch (error) {
-    console.error('Get applications error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Update application status (landlord only)
-app.put('/applications/:id', authenticateToken, async (req, res) => {
-  try {
-    const applicationId = parseInt(req.params.id);
-    const { status } = req.body;
-    
-    if (!['PENDING', 'ACCEPTED', 'REJECTED'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status. Must be PENDING, ACCEPTED, or REJECTED' });
-    }
-    
-    // Get application with property and user details
-    const application = await prisma.application.findUnique({
-      where: { id: applicationId },
-      include: {
-        property: { include: { landlord: true } },
-        user: true
-      }
-    });
-    
-    if (!application) {
-      return res.status(404).json({ error: 'Application not found' });
-    }
-    
-    // Check if user is the landlord
-    if (application.property.landlordId !== req.user.userId) {
-      return res.status(403).json({ error: 'Not authorized to update this application' });
-    }
-    
-    // Update application
-    const updatedApplication = await prisma.application.update({
-      where: { id: applicationId },
-      data: { status },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true, phone: true }
-        },
-        property: {
-          select: { id: true, title: true, address: true, city: true, rent: true }
-        }
-      }
-    });
-    
-    // Send email notification to applicant
-    const statusText = status === 'ACCEPTED' ? 'accepted' : 'rejected';
-    const emailSubject = `Application ${statusText} for ${application.property.title}`;
-    const emailHtml = `
-      <h2>🏠 Application Update</h2>
-      <p>Your application has been <strong style="color: ${status === 'ACCEPTED' ? 'green' : 'red'};">${statusText}</strong>.</p>
-      
-      <h3>Property Details:</h3>
-      <ul>
-        <li><strong>Title:</strong> ${application.property.title}</li>
-        <li><strong>Address:</strong> ${application.property.address}, ${application.property.city}</li>
-        <li><strong>Rent:</strong> ${application.property.rent.toLocaleString()} SEK/month</li>
-      </ul>
-      
-      ${status === 'ACCEPTED' ? `
-        <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin: 10px 0;">
-          <p><strong>🎉 Congratulations!</strong> Please contact the landlord to proceed with the rental process.</p>
-          <p><strong>Landlord Contact:</strong> ${application.property.landlord.email}</p>
-        </div>
-      ` : `
-        <p>Thank you for your interest. Keep looking for other great properties!</p>
-      `}
-      
-      <p><em>This is an automated message from Hyra Tryggt.</em></p>
-    `;
-    
-    await sendEmail(application.user.email, emailSubject, emailHtml);
-    
-    res.json({
-      message: 'Application status updated successfully',
-      application: updatedApplication
-    });
-    
-  } catch (error) {
-    console.error('Update application error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Get user's applications
-app.get('/my-applications', authenticateToken, async (req, res) => {
-  try {
-    const applications = await prisma.application.findMany({
-      where: { userId: req.user.userId },
-      include: {
-        property: {
-          include: {
-            landlord: {
-              select: { name: true, email: true, phone: true }
-            },
-            images: {
-              where: { isPrimary: true },
-              take: 1
-            }
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-    
-    res.json(applications);
-  } catch (error) {
-    console.error('Get my applications error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Get all applications for landlord's properties
-app.get('/my-property-applications', authenticateToken, async (req, res) => {
-  try {
-    const applications = await prisma.application.findMany({
-      where: {
-        property: {
-          landlordId: req.user.userId
-        }
-      },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true, phone: true, createdAt: true }
-        },
-        property: {
-          select: { id: true, title: true, address: true, city: true, rent: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-    
-    res.json(applications);
-  } catch (error) {
-    console.error('Get property applications error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Withdraw application (applicant only)
-app.delete('/applications/:id', authenticateToken, async (req, res) => {
-  try {
-    const applicationId = parseInt(req.params.id);
-    
-    const application = await prisma.application.findUnique({
-      where: { id: applicationId },
-      include: {
-        property: { include: { landlord: true } },
-        user: true
-      }
-    });
-    
-    if (!application) {
-      return res.status(404).json({ error: 'Application not found' });
-    }
-    
-    // Check if user is the applicant
-    if (application.userId !== req.user.userId) {
-      return res.status(403).json({ error: 'Not authorized to withdraw this application' });
-    }
-    
-    // Update status to withdrawn instead of deleting
-    await prisma.application.update({
-      where: { id: applicationId },
-      data: { status: 'WITHDRAWN' }
-    });
-    
-    // Notify landlord
-    const emailSubject = `Application withdrawn for ${application.property.title}`;
-    const emailHtml = `
-      <h2>🏠 Application Withdrawn</h2>
-      <p>${application.user.name} has withdrawn their application for:</p>
-      
-      <h3>Property:</h3>
-      <p><strong>${application.property.title}</strong><br>
-      ${application.property.address}, ${application.property.city}</p>
-      
-      <p><em>This is an automated message from Hyra Tryggt.</em></p>
-    `;
-    
-    await sendEmail(application.property.landlord.email, emailSubject, emailHtml);
-    
-    res.json({ message: 'Application withdrawn successfully' });
-    
-  } catch (error) {
-    console.error('Withdraw application error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Upload images for a property
-app.post('/properties/:id/images', authenticateToken, upload.array('images', 10), async (req, res) => {
-  try {
-    const propertyId = parseInt(req.params.id);
-    
-    const property = await prisma.property.findFirst({
-      where: { id: propertyId, landlordId: req.user.userId }
-    });
-    
-    if (!property) {
-      return res.status(404).json({ error: 'Property not found or not authorized' });
-    }
-    
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'No images uploaded' });
-    }
-    
-    const imagePromises = req.files.map((file, index) => {
-      const imageUrl = `/uploads/properties/${file.filename}`;
-      return prisma.propertyImage.create({
-        data: {
-          url: imageUrl,
-          alt: req.body.alt || `${property.title} - Image ${index + 1}`,
-          isPrimary: index === 0,
-          propertyId: propertyId
-        }
-      });
-    });
-    
-    const images = await Promise.all(imagePromises);
-    
-    res.status(201).json({
-      message: 'Images uploaded successfully',
-      images
-    });
-    
-  } catch (error) {
-    console.error('Image upload error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Get images for a property
-app.get('/properties/:id/images', async (req, res) => {
-  try {
-    const propertyId = parseInt(req.params.id);
-    
-    const images = await prisma.propertyImage.findMany({
-      where: { propertyId },
-      orderBy: [
-        { isPrimary: 'desc' },
-        { createdAt: 'asc' }
-      ]
-    });
-    
-    res.json(images);
-  } catch (error) {
-    console.error('Get images error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Delete an image
-app.delete('/images/:id', authenticateToken, async (req, res) => {
-  try {
-    const imageId = parseInt(req.params.id);
-    
-    const image = await prisma.propertyImage.findFirst({
-      where: { id: imageId },
-      include: { property: true }
-    });
-    
-    if (!image) {
-      return res.status(404).json({ error: 'Image not found' });
-    }
-    
-    if (image.property.landlordId !== req.user.userId) {
-      return res.status(403).json({ error: 'Not authorized to delete this image' });
-    }
-    
-    const filePath = path.join(__dirname, 'uploads', 'properties', path.basename(image.url));
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-    
-    await prisma.propertyImage.delete({
-      where: { id: imageId }
-    });
-    
-    res.json({ message: 'Image deleted successfully' });
-    
-  } catch (error) {
-    console.error('Delete image error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Set primary image
-app.put('/images/:id/primary', authenticateToken, async (req, res) => {
-  try {
-    const imageId = parseInt(req.params.id);
-    
-    const image = await prisma.propertyImage.findFirst({
-      where: { id: imageId },
-      include: { property: true }
-    });
-    
-    if (!image) {
-      return res.status(404).json({ error: 'Image not found' });
-    }
-    
-    if (image.property.landlordId !== req.user.userId) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
-    
-    await prisma.propertyImage.updateMany({
-      where: { propertyId: image.propertyId },
-      data: { isPrimary: false }
-    });
-    
-    const updatedImage = await prisma.propertyImage.update({
-      where: { id: imageId },
-      data: { isPrimary: true }
-    });
-    
-    res.json({
-      message: 'Primary image updated successfully',
-      image: updatedImage
-    });
-    
-  } catch (error) {
-    console.error('Set primary image error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Get all properties (public route with filtering)
+// Get all properties
 app.get('/properties', async (req, res) => {
   try {
     const { city, minRent, maxRent, minRooms, maxRooms, page = 1, limit = 20 } = req.query;
     
     const skip = (parseInt(page) - 1) * parseInt(limit);
     
-    const where = { isAvailable: true }; // Only show available properties
+    const where = { isAvailable: true };
     
     if (city) {
       where.city = { contains: city, mode: 'insensitive' };
@@ -897,38 +402,6 @@ app.get('/properties', async (req, res) => {
   }
 });
 
-// Get single property
-app.get('/properties/:id', async (req, res) => {
-  try {
-    const property = await prisma.property.findUnique({
-      where: { id: parseInt(req.params.id) },
-      include: {
-        landlord: {
-          select: { name: true, email: true, phone: true }
-        },
-        images: {
-          orderBy: [
-            { isPrimary: 'desc' },
-            { createdAt: 'asc' }
-          ]
-        },
-        _count: {
-          select: { applications: true }
-        }
-      }
-    });
-    
-    if (!property) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-    
-    res.json(property);
-  } catch (error) {
-    console.error('Get property error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 // Get user's properties
 app.get('/my-properties', authenticateToken, async (req, res) => {
   try {
@@ -955,137 +428,218 @@ app.get('/my-properties', authenticateToken, async (req, res) => {
   }
 });
 
-// Update property
-app.put('/properties/:id', authenticateToken, async (req, res) => {
+// Apply for property
+app.post('/properties/:id/apply', authenticateToken, async (req, res) => {
   try {
     const propertyId = parseInt(req.params.id);
-    const { title, description, address, city, rent, rooms, size, availableFrom, isAvailable } = req.body;
+    const { message } = req.body;
     
-    const existingProperty = await prisma.property.findFirst({
-      where: { id: propertyId, landlordId: req.user.userId }
-    });
-    
-    if (!existingProperty) {
-      return res.status(404).json({ error: 'Property not found or not authorized' });
-    }
-    
-    const updateData = {};
-    if (title) updateData.title = title.trim();
-    if (description !== undefined) updateData.description = description ? description.trim() : null;
-    if (address) updateData.address = address.trim();
-    if (city) updateData.city = city.trim();
-    if (rent) updateData.rent = parseInt(rent);
-    if (rooms) updateData.rooms = parseInt(rooms);
-    if (size) updateData.size = parseInt(size);
-    if (availableFrom) updateData.availableFrom = new Date(availableFrom);
-    if (typeof isAvailable === 'boolean') updateData.isAvailable = isAvailable;
-    
-    const property = await prisma.property.update({
+    const property = await prisma.property.findUnique({
       where: { id: propertyId },
-      data: updateData
+      include: { landlord: true }
     });
     
-    res.json({
-      message: 'Property updated successfully',
-      property
-    });
-    
-  } catch (error) {
-    console.error('Update property error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Delete property
-app.delete('/properties/:id', authenticateToken, async (req, res) => {
-  try {
-    const propertyId = parseInt(req.params.id);
-    
-    const existingProperty = await prisma.property.findFirst({
-      where: { id: propertyId, landlordId: req.user.userId },
-      include: { images: true }
-    });
-    
-    if (!existingProperty) {
-      return res.status(404).json({ error: 'Property not found or not authorized' });
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found' });
     }
     
-    // Delete all associated images from filesystem
-    existingProperty.images.forEach(image => {
-      const filePath = path.join(__dirname, 'uploads', 'properties', path.basename(image.url));
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    if (!property.isAvailable) {
+      return res.status(400).json({ error: 'Property is no longer available' });
+    }
+    
+    if (property.landlordId === req.user.userId) {
+      return res.status(400).json({ error: 'You cannot apply to your own property' });
+    }
+    
+    const existingApplication = await prisma.application.findUnique({
+      where: {
+        userId_propertyId: {
+          userId: req.user.userId,
+          propertyId: propertyId
+        }
       }
     });
     
-    await prisma.property.delete({
-      where: { id: propertyId }
+    if (existingApplication) {
+      return res.status(409).json({ error: 'You have already applied to this property' });
+    }
+    
+    const applicant = await prisma.user.findUnique({
+      where: { id: req.user.userId }
     });
     
-    res.json({ message: 'Property deleted successfully' });
+    const application = await prisma.application.create({
+      data: {
+        userId: req.user.userId,
+        propertyId: propertyId,
+        message: message || null,
+        status: 'PENDING'
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, phone: true }
+        },
+        property: {
+          select: { id: true, title: true, address: true, city: true, rent: true }
+        }
+      }
+    });
+    
+    res.status(201).json({
+      message: 'Application submitted successfully',
+      application
+    });
     
   } catch (error) {
-    console.error('Delete property error:', error);
+    console.error('Application error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: isProduction ? 'production' : 'development',
-    emailConfigured: !!emailTransporter
-  });
+// Get user applications
+app.get('/my-applications', authenticateToken, async (req, res) => {
+  try {
+    const applications = await prisma.application.findMany({
+      where: { userId: req.user.userId },
+      include: {
+        property: {
+          include: {
+            landlord: {
+              select: { name: true, email: true, phone: true }
+            },
+            images: {
+              where: { isPrimary: true },
+              take: 1
+            }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    res.json(applications);
+  } catch (error) {
+    console.error('Get my applications error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Error handling middleware
+// Get applications for landlord's properties
+app.get('/my-property-applications', authenticateToken, async (req, res) => {
+  try {
+    const applications = await prisma.application.findMany({
+      where: {
+        property: {
+          landlordId: req.user.userId
+        }
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, phone: true, createdAt: true }
+        },
+        property: {
+          select: { id: true, title: true, address: true, city: true, rent: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    res.json(applications);
+  } catch (error) {
+    console.error('Get property applications error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update application status
+app.put('/applications/:id', authenticateToken, async (req, res) => {
+  try {
+    const applicationId = parseInt(req.params.id);
+    const { status } = req.body;
+    
+    if (!['PENDING', 'ACCEPTED', 'REJECTED'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status. Must be PENDING, ACCEPTED, or REJECTED' });
+    }
+    
+    const application = await prisma.application.findUnique({
+      where: { id: applicationId },
+      include: {
+        property: { include: { landlord: true } },
+        user: true
+      }
+    });
+    
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+    
+    if (application.property.landlordId !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to update this application' });
+    }
+    
+    const updatedApplication = await prisma.application.update({
+      where: { id: applicationId },
+      data: { status },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, phone: true }
+        },
+        property: {
+          select: { id: true, title: true, address: true, city: true, rent: true }
+        }
+      }
+    });
+    
+    res.json({
+      message: 'Application status updated successfully',
+      application: updatedApplication
+    });
+    
+  } catch (error) {
+    console.error('Update application error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Withdraw application
+app.delete('/applications/:id', authenticateToken, async (req, res) => {
+  try {
+    const applicationId = parseInt(req.params.id);
+    
+    const application = await prisma.application.findUnique({
+      where: { id: applicationId },
+      include: {
+        property: { include: { landlord: true } },
+        user: true
+      }
+    });
+    
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+    
+    if (application.userId !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to withdraw this application' });
+    }
+    
+    await prisma.application.update({
+      where: { id: applicationId },
+      data: { status: 'WITHDRAWN' }
+    });
+    
+    res.json({ message: 'Application withdrawn successfully' });
+    
+  } catch (error) {
+    console.error('Withdraw application error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Error handling
 app.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
-    }
-    if (err.code === 'LIMIT_FILE_COUNT') {
-      return res.status(400).json({ error: 'Too many files. Maximum is 10 images.' });
-    }
-  }
-  
-  if (err.message === 'Only image files are allowed!') {
-    return res.status(400).json({ error: 'Only image files are allowed!' });
-  }
-  
   console.error('Unhandled error:', err);
-  res.status(500).json({ error: isProduction ? 'Internal server error' : err.message });
+  res.status(500).json({ error: 'Internal server error' });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
-});
-
-// For local development only
-if (!isProduction) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Hyra Tryggt server running on port ${PORT}`);
-    console.log(`📧 Email notifications: ${emailTransporter ? 'Enabled' : 'Disabled'}`);
-    console.log(`🌍 Environment: ${isProduction ? 'Production' : 'Development'}`);
-  });
-  
-  // Graceful shutdown
-  process.on('SIGTERM', async () => {
-    console.log('SIGTERM received, shutting down gracefully');
-    await prisma.$disconnect();
-    process.exit(0);
-  });
-
-  process.on('SIGINT', async () => {
-    console.log('SIGINT received, shutting down gracefully');
-    await prisma.$disconnect();
-    process.exit(0);
-  });
-}
-
-// Export for Vercel - this is the key change for serverless
+// Export as Vercel serverless function
 module.exports = app;
