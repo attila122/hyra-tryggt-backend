@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hyra Tryggt - Complete Rental Platform</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin: 10px 0; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+        }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        button { 
+            background: #007bff; color: white; padding: 10px 20px; border: none; 
+            border-radius: 4px; cursor: pointer; margin: 5px; 
+        }
+        button:hover { background: #0056b3; }
+        button.delete { background: #dc3545; }
+        button.delete:hover { background: #c82333; }
+        button.primary { background: #28a745; }
+        button.primary:hover { background: #218838; }
+        button.warning { background: #ffc107; color: #212529; }
+        button.warning:hover { background: #e0a800; }
+        .result { 
+            background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 4px; 
+            border-left: 4px solid #007bff; font-family: monospace; font-size: 12px;
+        }
+        .success { border-left-color: #28a745; }
+        .error { border-left-color: #dc3545; }
+        .token-display { 
+            background: #e9ecef; padding: 10px; border-radius: 4px; 
+            word-break: break-all; font-size: 12px; margin: 10px 0;
+        }
+        
+        /* Property Card Styles */
+        .property-card { 
+            border: 1px solid #ddd; padding: 20px; margin: 15px 0; 
+            border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .property-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .property-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .property-title {
+            font-size: 20px; font-weight: bold; color: #333; margin: 0;
+        }
+        .property-price {
+            font-size: 18px; font-weight: bold; color: #28a745;
+        }
+        .property-details {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px; margin: 15px 0;
+        }
+        .property-detail {
+            background: #f8f9fa; padding: 8px 12px; border-radius: 4px;
+            font-size: 14px;
+        }
+        .property-description {
+            margin: 15px 0; color: #666; line-height: 1.5;
+        }
+        .property-landlord {
+            background: #e7f3ff; padding: 10px; border-radius: 4px; margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        /* Application Styles */
+        .application-card {
+            border: 1px solid #ddd; padding: 15px; margin: 10px 0;
+            border-radius: 8px; background: white;
+        }
+        .application-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .application-status {
+            padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-accepted { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-withdrawn { background: #e2e3e5; color: #383d41; }
+        
+        /* Image Gallery Styles */
+        .property-images {
+            margin: 15px 0;
+        }
+        .image-gallery { 
+            display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; 
+        }
+        .image-item { 
+            position: relative; border: 2px solid #ddd; border-radius: 8px; 
+            overflow: hidden; width: 150px; height: 120px; cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .image-item:hover {
+            transform: scale(1.05);
+        }
+        .image-item img { 
+            width: 100%; height: 100%; object-fit: cover; 
+        }
+        .image-item.primary { 
+            border-color: #28a745; 
+        }
+        .image-controls { 
+            position: absolute; top: 5px; right: 5px; 
+            display: flex; gap: 2px;
+        }
+        .image-controls button { 
+            padding: 2px 6px; font-size: 10px; margin: 0; 
+        }
+        .image-upload { 
+            border: 2px dashed #ddd; padding: 40px; text-align: center; 
+            border-radius: 4px; margin: 10px 0; cursor: pointer;
+            background: #fafafa;
+        }
+        .image-upload:hover { 
+            border-color: #007bff; background: #f8f9ff; 
+        }
+        .primary-badge { 
+            background: #28a745; color: white; padding: 2px 6px; 
+            border-radius: 3px; font-size: 10px; 
+            position: absolute; bottom: 5px; left: 5px;
+        }
+        .no-image {
+            background: #f8f9fa; border: 2px dashed #ddd; padding: 20px;
+            text-align: center; color: #666; border-radius: 8px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            margin: auto; display: block; width: 80%; max-width: 700px;
+            max-height: 80%; margin-top: 5%;
+        }
+        .close {
+            position: absolute; top: 15px; right: 35px; color: #f1f1f1;
+            font-size: 40px; font-weight: bold; cursor: pointer;
+        }
+        .close:hover { color: #bbb; }
+        
+        .filters { background: #e7f3ff; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        h3 { color: #666; }
+        .upload-section-hidden { display: none; }
+        .upload-section-visible { display: block; }
+        
+        .pagination {
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            margin: 20px 0; padding: 20px;
+        }
+        .pagination button {
+            padding: 8px 12px; margin: 0;
+        }
+        .pagination .current-page {
+            background: #28a745; color: white; padding: 8px 12px; border-radius: 4px;
+        }
+        
+        .apply-form {
+            background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;
+            border: 1px solid #dee2e6;
+        }
+        
+        .tab-container {
+            display: flex; border-bottom: 1px solid #ddd; margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent;
+            background: #f8f9fa; margin-right: 5px; border-radius: 4px 4px 0 0;
+        }
+        .tab.active {
+            background: white; border-bottom-color: #007bff; color: #007bff; font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Hyra Tryggt - Complete Rental Platform v3.0</h1>
+        
+        <!-- API Status -->
+        <div class="section">
+            <h2>📡 API Status</h2>
+            <button onclick="checkAPI()">Check API Health</button>
+            <button onclick="debugLogin()">🔍 Debug Login Status</button>
+            <div id="apiResult" class="result"></div>
+        </div>
+
+        <!-- Authentication -->
+        <div class="section">
+            <h2>🔐 Authentication</h2>
+            
+            <h3>Register New User</h3>
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="regEmail" placeholder="user@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" id="regName" placeholder="John Doe" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="regPassword" placeholder="Min 6 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone (optional):</label>
+                        <input type="text" id="regPhone" placeholder="+46701234567">
+                    </div>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <div id="registerResult" class="result"></div>
+
+            <h3>Login</h3>
+            <form id="loginForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <div id="loginResult" class="result"></div>
+            <div id="tokenDisplay" class="token-display" style="display: none;"></div>
+        </div>
+
+        <!-- Property Management -->
+        <div class="section">
+            <h2>🏡 Property Management</h2>
+            
+            <h3>Add New Property</h3>
+            <form id="propertyForm">
+                <div class="form-group">
+                    <label>Title:</label>
+                    <input type="text" id="propTitle" placeholder="Beautiful 2-room apartment in Södermalm" required>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="propDescription" rows="3" placeholder="Newly renovated apartment with modern kitchen and balcony..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Address:</label>
+                        <input type="text" id="propAddress" placeholder="Götgatan 15" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City:</label>
+                        <input type="text" id="propCity" placeholder="Stockholm" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Monthly Rent (SEK):</label>
+                        <input type="number" id="propRent" placeholder="15000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rooms:</label>
+                        <input type="number" id="propRooms" placeholder="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Size (sqm):</label>
+                        <input type="number" id="propSize" placeholder="65" required>
+                    </div>
+                </div>
+                <button type="submit">Add Property</button>
+            </form>
+            <div id="propertyResult" class="result"></div>
+        </div>
+
+        <!-- IMAGE UPLOAD SECTION -->
+        <div class="section">
+            <h2>📸 Property Images</h2>
+            
+            <div class="form-group">
+                <label>Select Property for Image Upload:</label>
+                <select id="imagePropertySelect" style="margin-bottom: 10px;">
+                    <option value="">First, load your properties...</option>
+                </select>
+                <button onclick="loadPropertiesForImages()">🔄 Load My Properties</button>
+            </div>
+
+            <div id="imageUploadSection" class="upload-section-hidden">
+                <h3>📤 Upload New Images</h3>
+                <div class="image-upload" onclick="document.getElementById('imageInput').click()">
+                    <input type="file" id="imageInput" multiple accept="image/*" style="display: none;" onchange="previewImages()">
+                    <p style="font-size: 24px; margin: 10px 0;">📷</p>
+                    <p style="font-size: 16px; margin: 10px 0;"><strong>Click here to select images</strong></p>
+                    <p style="font-size: 12px; color: #666;">Max 10 images, 5MB each. JPG, PNG, GIF supported.</p>
+                </div>
+                
+                <div id="imagePreview" class="image-gallery"></div>
+                <button id="uploadBtn" onclick="uploadImages()" style="display: none; background: #28a745;">📤 Upload Images</button>
+                <div id="uploadResult" class="result"></div>
+
+                <h3>🖼️ Current Images</h3>
+                <button onclick="loadPropertyImages()">🔄 Refresh Images</button>
+                <div id="currentImages" class="image-gallery" style="min-height: 50px; border: 1px dashed #ddd; border-radius: 4px; padding: 20px;">
+                    <p style="color: #666; text-align: center;">Select a property and click "Refresh Images" to see current images</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPLICATION MANAGEMENT -->
+        <div class="section">
+            <h2>📋 Application Management</h2>
+            
+            <div class="tab-container">
+                <div class="tab active" onclick="switchTab('myApplications')">My Applications</div>
+                <div class="tab" onclick="switchTab('receivedApplications')">Received Applications</div>
+            </div>
+            
+            <div id="myApplications" class="tab-content active">
+                <h3>📨 My Applications</h3>
+                <p style="color: #666;">Properties you've applied to rent</p>
+                <button onclick="loadMyApplications()">🔄 Load My Applications</button>
+                <div id="myApplicationsList"></div>
+            </div>
+            
+            <div id="receivedApplications" class="tab-content">
+                <h3>📬 Received Applications</h3>
+                <p style="color: #666;">Applications for your properties</p>
+                <button onclick="loadReceivedApplications()">🔄 Load Received Applications</button>
+                <div id="receivedApplicationsList"></div>
+            </div>
+        </div>
+
+        <!-- PROPERTY SEARCH & APPLY -->
+        <div class="section">
+            <h2>🔍 Property Search & Apply</h2>
+            
+            <div class="filters">
+                <h3>Search Filters</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City:</label>
+                        <input type="text" id="searchCity" placeholder="Stockholm">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Rent:</label>
+                        <input type="number" id="searchMinRent" placeholder="5000">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Rent:</label>
+                        <input type="number" id="searchMaxRent" placeholder="20000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <button onclick="searchProperties()">🔍 Search Properties</button>
+                    <button onclick="getAllProperties()">📋 Get All Properties</button>
+                    <button onclick="clearFilters()">🗑️ Clear Filters</button>
+                </div>
+            </div>
+            
+            <!-- Property Results -->
+            <div id="propertyResults"></div>
+            
+            <!-- Pagination -->
+            <div id="pagination" class="pagination" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        let currentToken = '';
+        let selectedPropertyId = null;
+        let currentPage = 1;
+        const API_BASE = '';
+
+        // Debug login status
+        function debugLogin() {
+            const status = {
+                isLoggedIn: !!currentToken,
+                tokenExists: currentToken ? 'Yes' : 'No',
+                tokenPreview: currentToken ? currentToken.substring(0, 20) + '...' : 'None'
+            };
+            showResult('apiResult', status, !!currentToken);
+        }
+
+        // API Health Check
+        async function checkAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/`);
+                const result = await response.json();
+                showResult('apiResult', result, true);
+            } catch (error) {
+                showResult('apiResult', { error: error.message }, false);
+            }
+        }
+
+        // Register
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                name: document.getElementById('regName').value,
+                phone: document.getElementById('regPhone').value || null
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                showResult('registerResult', result, response.ok);
+            } catch (error) {
+                showResult('registerResult', { error: error.message }, false);
+            }
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                showResult('loginResult', result, response.ok);
+                
+                if (response.ok && result.token) {
+                    currentToken = result.token;
+                    document.getElementById('tokenDisplay').style.display = 'block';
+                    document.getElementById('tokenDisplay').innerHTML = `<strong>🔑 Logged in as:</strong> ${result.user.name} (${result.user.email})`;
+                    
+                    // Show success message
+                    alert(`✅ Successfully logged in as ${result.user.name}!`);
+                    
+                    // Clear the form
+                    document.getElementById('loginForm').reset();
+                } else {
+                    // Show error
+                    alert(`❌ Login failed: ${result.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                showResult('loginResult', { error: error.message }, false);
+                alert(`❌ Login error: ${error.message}`);
+            }
+        });
+
+        // Add Property
+        document.getElementById('propertyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentToken) {
+                showResult('propertyResult', { error: 'Please login first' }, false);
+                return;
+            }
+            
+            const data = {
+                title: document.getElementById('propTitle').value,
+                description: document.getElementById('propDescription').value,
+                address: document.getElementById('propAddress').value,
+                city: document.getElementById('propCity').value,
+                rent: parseInt(document.getElementById('propRent').value),
+                rooms: parseInt(document.getElementById('propRooms').value),
+                size: parseInt(document.getElementById('propSize').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/properties`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                showResult('propertyResult', result, response.ok);
+                
+                if (response.ok) {
+                    document.getElementById('propertyForm').reset();
+                    loadPropertiesForImages();
+                }
+            } catch (error) {
+                showResult('propertyResult', { error: error.message }, false);
+            }
+        });
+
+        // Load Properties for Image Upload
+        async function loadPropertiesForImages() {
+            if (!currentToken) {
+                showResult('uploadResult', { error: 'Please login first' }, false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/my-properties`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const select = document.getElementById('imagePropertySelect');
+                    select.innerHTML = '<option value="">Select a property...</option>';
+                    
+                    result.forEach(property => {
+                        const option = document.createElement('option');
+                        option.value = property.id;
+                        option.textContent = `${property.title} - ${property.city}`;
+                        select.appendChild(option);
+                    });
+                } else {
+                    showResult('uploadResult', result, false);
+                }
+            } catch (error) {
+                showResult('uploadResult', { error: error.message }, false);
+            }
+        }
+
+        // Handle property selection for images
+        document.getElementById('imagePropertySelect').addEventListener('change', function() {
+            selectedPropertyId = this.value;
+            const uploadSection = document.getElementById('imageUploadSection');
+            
+            if (selectedPropertyId) {
+                uploadSection.className = 'upload-section-visible';
+                loadPropertyImages();
+            } else {
+                uploadSection.className = 'upload-section-hidden';
+            }
+        });
+
+        // Preview selected images
+        function previewImages() {
+            const input = document.getElementById('imageInput');
+            const preview = document.getElementById('imagePreview');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            preview.innerHTML = '';
+            
+            if (input.files.length > 0) {
+                uploadBtn.style.display = 'block';
+                
+                for (let i = 0; i < input.files.length; i++) {
+                    const file = input.files[i];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const imageItem = document.createElement('div');
+                        imageItem.className = 'image-item';
+                        imageItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <div style="position: absolute; bottom: 5px; left: 5px; background: rgba(0,0,0,0.7); color: white; padding: 2px 5px; font-size: 10px; border-radius: 2px;">
+                                ${file.name}
+                            </div>
+                        `;
+                        preview.appendChild(imageItem);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            } else {
+                uploadBtn.style.display = 'none';
+            }
+        }
+
+        // Upload images
+        async function uploadImages() {
+            if (!currentToken || !selectedPropertyId) {
+                showResult('uploadResult', { error: 'Please login and select a property first' }, false);
+                return;
+            }
+
+            const input = document.getElementById('imageInput');
+            if (!input.files.length) {
+                showResult('uploadResult', { error: 'Please select images to upload' }, false);
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < input.files.length; i++) {
+                formData.append('images', input.files[i]);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/properties/${selectedPropertyId}/images`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                showResult('uploadResult', result, response.ok);
+                
+                if (response.ok) {
+                    input.value = '';
+                    document.getElementById('imagePreview').innerHTML = '';
+                    document.getElementById('uploadBtn').style.display = 'none';
+                    loadPropertyImages();
+                }
+            } catch (error) {
+                showResult('uploadResult', { error: error.message }, false);
+            }
+        }
+
+        // Load current property images
+        async function loadPropertyImages() {
+            if (!selectedPropertyId) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/properties/${selectedPropertyId}/images`);
+                const images = await response.json();
+                
+                const container = document.getElementById('currentImages');
+                container.innerHTML = '';
+                
+                if (images.length === 0) {
+                    container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No images uploaded yet.</p>';
+                    return;
+                }
+                
+                images.forEach(image => {
+                    const imageItem = document.createElement('div');
+                    imageItem.className = `image-item ${image.isPrimary ? 'primary' : ''}`;
+                    imageItem.innerHTML = `
+                        <img src="${API_BASE}${image.url}" alt="${image.alt}" onclick="openModal('${API_BASE}${image.url}')">
+                        <div class="image-controls">
+                            ${!image.isPrimary ? `<button class="primary" onclick="setPrimaryImage(${image.id})">★</button>` : ''}
+                            <button class="delete" onclick="deleteImage(${image.id})">×</button>
+                        </div>
+                        ${image.isPrimary ? '<div class="primary-badge">Primary</div>' : ''}
+                    `;
+                    container.appendChild(imageItem);
+                });
+            } catch (error) {
+                console.error('Error loading images:', error);
+            }
+        }
+
+        // Set primary image
+        async function setPrimaryImage(imageId) {
+            if (!currentToken) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/images/${imageId}/primary`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                if (response.ok) {
+                    loadPropertyImages();
+                }
+            } catch (error) {
+                console.error('Error setting primary image:', error);
+            }
+        }
+
+        // Delete image
+        async function deleteImage(imageId) {
+            if (!currentToken) return;
+            
+            if (!confirm('Are you sure you want to delete this image?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/images/${imageId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                if (response.ok) {
+                    loadPropertyImages();
+                }
+            } catch (error) {
+                console.error('Error deleting image:', error);
+            }
+        }
+
+        // APPLICATION FUNCTIONS
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Apply for property
+        async function applyForProperty(propertyId) {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+
+            const message = prompt('Add a message with your application (optional):');
+            if (message === null) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/properties/${propertyId}/apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Application submitted successfully! 📧 The landlord will be notified by email.');
+                    searchProperties();
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Load my applications
+        async function loadMyApplications() {
+            if (!currentToken) {
+                document.getElementById('myApplicationsList').innerHTML = '<p style="color: #dc3545;">Please login first</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/my-applications`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                const applications = await response.json();
+                
+                if (response.ok) {
+                    displayMyApplications(applications);
+                } else {
+                    document.getElementById('myApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${applications.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('myApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Display my applications
+        function displayMyApplications(applications) {
+            const container = document.getElementById('myApplicationsList');
+            
+            if (applications.length === 0) {
+                container.innerHTML = '<p style="color: #666;">You haven\'t applied to any properties yet.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            applications.forEach(app => {
+                const appCard = document.createElement('div');
+                appCard.className = 'application-card';
+                
+                appCard.innerHTML = `
+                    <div class="application-header">
+                        <h4>${app.property.title}</h4>
+                        <span class="application-status status-${app.status.toLowerCase()}">${app.status}</span>
+                    </div>
+                    
+                    <div class="property-details">
+                        <div class="property-detail">📍 ${app.property.address}, ${app.property.city}</div>
+                        <div class="property-detail">💰 ${app.property.rent.toLocaleString()} SEK/month</div>
+                        <div class="property-detail">📅 Applied: ${new Date(app.createdAt).toLocaleDateString()}</div>
+                        <div class="property-detail">👤 Landlord: ${app.property.landlord.name}</div>
+                    </div>
+                    
+                    ${app.message ? `<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0;"><strong>Your message:</strong><br>${app.message}</div>` : ''}
+                    
+                    <div style="margin-top: 15px;">
+                        ${app.status === 'PENDING' ? `<button class="warning" onclick="withdrawApplication(${app.id})">↩️ Withdraw</button>` : ''}
+                        ${app.status === 'ACCEPTED' ? `<button class="primary">📧 Contact: ${app.property.landlord.email}</button>` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(appCard);
+            });
+        }
+
+        // Withdraw application
+        async function withdrawApplication(applicationId) {
+            if (!confirm('Are you sure you want to withdraw this application?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/applications/${applicationId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Application withdrawn successfully');
+                    loadMyApplications();
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Load received applications
+        async function loadReceivedApplications() {
+            if (!currentToken) {
+                document.getElementById('receivedApplicationsList').innerHTML = '<p style="color: #dc3545;">Please login first</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/my-property-applications`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                const applications = await response.json();
+                
+                if (response.ok) {
+                    displayReceivedApplications(applications);
+                } else {
+                    document.getElementById('receivedApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${applications.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('receivedApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Display received applications
+        function displayReceivedApplications(applications) {
+            const container = document.getElementById('receivedApplicationsList');
+            
+            if (applications.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No applications received yet.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            applications.forEach(app => {
+                const appCard = document.createElement('div');
+                appCard.className = 'application-card';
+                
+                appCard.innerHTML = `
+                    <div class="application-header">
+                        <h4>Application for: ${app.property.title}</h4>
+                        <span class="application-status status-${app.status.toLowerCase()}">${app.status}</span>
+                    </div>
+                    
+                    <div class="property-details">
+                        <div class="property-detail">👤 Applicant: ${app.user.name}</div>
+                        <div class="property-detail">📧 Email: ${app.user.email}</div>
+                        ${app.user.phone ? `<div class="property-detail">📞 Phone: ${app.user.phone}</div>` : ''}
+                        <div class="property-detail">📅 Applied: ${new Date(app.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    
+                    ${app.message ? `<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0;"><strong>Message:</strong><br>${app.message}</div>` : ''}
+                    
+                    <div style="margin-top: 15px;">
+                        ${app.status === 'PENDING' ? `
+                            <button class="primary" onclick="updateApplicationStatus(${app.id}, 'ACCEPTED')">✅ Accept</button>
+                            <button class="delete" onclick="updateApplicationStatus(${app.id}, 'REJECTED')">❌ Reject</button>
+                        ` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(appCard);
+            });
+        }
+
+        // Update application status
+        async function updateApplicationStatus(applicationId, status) {
+            const action = status === 'ACCEPTED' ? 'accept' : 'reject';
+            if (!confirm(`Are you sure you want to ${action} this application?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/applications/${applicationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`Application ${action}ed successfully! 📧 Applicant will be notified by email.`);
+                    loadReceivedApplications();
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Search Properties
+        async function searchProperties(page = 1) {
+            currentPage = page;
+            
+            const params = new URLSearchParams();
+            
+            const city = document.getElementById('searchCity').value;
+            const minRent = document.getElementById('searchMinRent').value;
+            const maxRent = document.getElementById('searchMaxRent').value;
+            
+            if (city) params.append('city', city);
+            if (minRent) params.append('minRent', minRent);
+            if (maxRent) params.append('maxRent', maxRent);
+            params.append('page', page);
+            params.append('limit', 20);
+
+            try {
+                const response = await fetch(`${API_BASE}/properties?${params.toString()}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayProperties(result.properties);
+                    displayPagination(result.pagination);
+                } else {
+                    document.getElementById('propertyResults').innerHTML = `<div class="property-card"><p style="color: #dc3545;">Error: ${result.error}</p></div>`;
+                }
+            } catch (error) {
+                document.getElementById('propertyResults').innerHTML = `<div class="property-card"><p style="color: #dc3545;">Error: ${error.message}</p></div>`;
+            }
+        }
+
+        // Get All Properties
+        async function getAllProperties() {
+            searchProperties(1);
+        }
+
+        // Display Properties
+        function displayProperties(properties) {
+            const container = document.getElementById('propertyResults');
+            
+            if (!properties || properties.length === 0) {
+                container.innerHTML = '<div class="property-card"><p style="text-align: center; color: #666;">No properties found.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            properties.forEach(property => {
+                const propertyCard = document.createElement('div');
+                propertyCard.className = 'property-card';
+                
+                const totalImages = property.images?.length || 0;
+                const applicationCount = property._count?.applications || 0;
+                
+                propertyCard.innerHTML = `
+                    <div class="property-header">
+                        <h3 class="property-title">${property.title}</h3>
+                        <div class="property-price">${property.rent.toLocaleString()} SEK/month</div>
+                    </div>
+                    
+                    <div class="property-details">
+                        <div class="property-detail">📍 ${property.address}, ${property.city}</div>
+                        <div class="property-detail">🏠 ${property.rooms} rooms</div>
+                        <div class="property-detail">📐 ${property.size} sqm</div>
+                        <div class="property-detail">👤 ${property.landlord.name}</div>
+                        ${applicationCount > 0 ? `<div class="property-detail">📨 ${applicationCount} applications</div>` : ''}
+                    </div>
+                    
+                    ${property.description ? `<div class="property-description">${property.description}</div>` : ''}
+                    
+                    <div class="property-images">
+                        ${totalImages > 0 ? `
+                            <h4>📷 Images (${totalImages})</h4>
+                            <div class="image-gallery">
+                                ${property.images.map(image => `
+                                    <div class="image-item ${image.isPrimary ? 'primary' : ''}" onclick="openModal('${API_BASE}${image.url}')">
+                                        <img src="${API_BASE}${image.url}" alt="${image.alt}">
+                                        ${image.isPrimary ? '<div class="primary-badge">Primary</div>' : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="no-image">
+                                <p>📷 No images available</p>
+                            </div>
+                        `}
+                    </div>
+                    
+                    <div class="property-landlord">
+                        <strong>Contact:</strong> ${property.landlord.name} - ${property.landlord.email}
+                        <br>
+                        <div style="margin-top: 10px;">
+                            ${currentToken ? 
+                                `<button class="primary" onclick="applyForProperty(${property.id})">📨 Apply Now</button>` : 
+                                `<button class="warning" onclick="alert('Please login first to apply for properties!')">📨 Login Required</button>`
+                            }
+                            <small style="display: block; margin-top: 5px; color: #666;">
+                                ${currentToken ? '✅ You can apply for this property' : '⚠️ Login required to apply'}
+                            </small>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(propertyCard);
+            });
+        }
+
+        // Display Pagination
+        function displayPagination(pagination) {
+            const container = document.getElementById('pagination');
+            
+            if (pagination.pages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'flex';
+            container.innerHTML = '';
+            
+            if (pagination.page > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.textContent = '← Previous';
+                prevBtn.onclick = () => searchProperties(pagination.page - 1);
+                container.appendChild(prevBtn);
+            }
+            
+            const currentPage = document.createElement('div');
+            currentPage.className = 'current-page';
+            currentPage.textContent = pagination.page;
+            container.appendChild(currentPage);
+            
+            if (pagination.page < pagination.pages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.textContent = 'Next →';
+                nextBtn.onclick = () => searchProperties(pagination.page + 1);
+                container.appendChild(nextBtn);
+            }
+            
+            const pageInfo = document.createElement('div');
+            pageInfo.innerHTML = `Page ${pagination.page} of ${pagination.pages} (${pagination.total} properties)`;
+            pageInfo.style.marginLeft = '20px';
+            pageInfo.style.padding = '8px';
+            pageInfo.style.color = '#666';
+            container.appendChild(pageInfo);
+        }
+
+        // Clear Filters
+        function clearFilters() {
+            document.getElementById('searchCity').value = '';
+            document.getElementById('searchMinRent').value = '';
+            document.getElementById('searchMaxRent').value = '';
+            
+            document.getElementById('propertyResults').innerHTML = '';
+            document.getElementById('pagination').style.display = 'none';
+            
+            currentPage = 1;
+        }
+
+        // Image Modal Functions
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Helper function to display results
+        function showResult(elementId, data, success) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            element.className = success ? 'result success' : 'result error';
+        }
+
+        // Load API status on page load
+        checkAPI();
+    </script>
+</body>
+</html>
