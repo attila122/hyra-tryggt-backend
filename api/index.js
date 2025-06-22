@@ -11,12 +11,13 @@ const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-app.use(express.static('public'));
-
 console.log('Starting Hyra Tryggt server...');
 
 const app = express();
 const prisma = new PrismaClient();
+
+// Serve static files AFTER app is declared
+app.use(express.static('public'));
 
 // Production environment check
 const isProduction = process.env.NODE_ENV === 'production';
@@ -31,7 +32,7 @@ if (!isProduction && !fs.existsSync(uploadsDir)) {
 // Configure email transporter
 let emailTransporter = null;
 if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-  emailTransporter = nodemailer.createTransport({
+  emailTransporter = nodemailer.createTransporter({
     service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
@@ -113,6 +114,7 @@ app.use(limiter);
 const allowedOrigins = [
   'https://hyratryggt.se',
   'https://www.hyratryggt.se',
+  'https://hyra-tryggt-backend-z5kb.vercel.app',
   'http://localhost:3000',
   'http://localhost:8080',
   'null',
@@ -1063,25 +1065,27 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Hyra Tryggt server running on port ${PORT}`);
-  console.log(`📧 Email notifications: ${emailTransporter ? 'Enabled' : 'Disabled'}`);
-  console.log(`🌍 Environment: ${isProduction ? 'Production' : 'Development'}`);
-});
+// For local development only
+if (!isProduction) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Hyra Tryggt server running on port ${PORT}`);
+    console.log(`📧 Email notifications: ${emailTransporter ? 'Enabled' : 'Disabled'}`);
+    console.log(`🌍 Environment: ${isProduction ? 'Production' : 'Development'}`);
+  });
+  
+  // Graceful shutdown
+  process.on('SIGTERM', async () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    await prisma.$disconnect();
+    process.exit(0);
+  });
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  await prisma.$disconnect();
-  process.exit(0);
-});
+  process.on('SIGINT', async () => {
+    console.log('SIGINT received, shutting down gracefully');
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+}
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received, shutting down gracefully');
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-// Export for Vercel
+// Export for Vercel - this is the key change for serverless
 module.exports = app;
