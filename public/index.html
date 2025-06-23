@@ -393,6 +393,7 @@
         let currentToken = '';
         let selectedPropertyId = null;
         let currentPage = 1;
+        // FIXED: Set the correct API base URL
         const API_BASE = 'https://hyra-tryggt-backend-pjo8-3asczquuo-attila122s-projects.vercel.app';
 
         // Debug login status
@@ -400,19 +401,46 @@
             const status = {
                 isLoggedIn: !!currentToken,
                 tokenExists: currentToken ? 'Yes' : 'No',
-                tokenPreview: currentToken ? currentToken.substring(0, 20) + '...' : 'None'
+                tokenPreview: currentToken ? currentToken.substring(0, 20) + '...' : 'None',
+                apiBase: API_BASE
             };
             showResult('apiResult', status, !!currentToken);
         }
 
-        // API Health Check
+        // API Health Check with better error handling
         async function checkAPI() {
             try {
-                const response = await fetch(`${API_BASE}/`);
+                console.log('Checking API at:', API_BASE);
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    throw new Error(`Expected JSON but got: ${contentType}. Response: ${text.substring(0, 200)}...`);
+                }
+                
                 const result = await response.json();
                 showResult('apiResult', result, true);
             } catch (error) {
-                showResult('apiResult', { error: error.message }, false);
+                console.error('API check error:', error);
+                showResult('apiResult', { 
+                    error: error.message,
+                    apiUrl: API_BASE,
+                    timestamp: new Date().toISOString()
+                }, false);
             }
         }
 
@@ -1129,6 +1157,3 @@
 
         // Load API status on page load
         checkAPI();
-    </script>
-</body>
-</html>
