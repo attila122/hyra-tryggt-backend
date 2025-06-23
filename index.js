@@ -12,6 +12,7 @@ const nodemailer = require('nodemailer');
 
 // Initialize Express app
 const app = express();
+const PORT = process.env.PORT || 10000;
 
 // Add request logging for debugging
 app.use((req, res, next) => {
@@ -863,7 +864,11 @@ app.use((err, req, res, next) => {
     timestamp: new Date().toISOString()
   });
 });
+// Ta bort detta villkor:
+// if (require.main === module) {
 
+
+// }  // Ta bort denna avslutande klammer också
 // Graceful shutdown handling
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
@@ -874,6 +879,12 @@ process.on('SIGTERM', async () => {
 });
 
 console.log('Server initialized successfully');
-
+// Och lägg till detta istället (utan villkor):
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📊 Prisma: ${prisma ? 'Connected' : 'Not connected'}`);
+  console.log(`📧 Email: ${emailTransporter ? 'Enabled' : 'Disabled'}`);
+});
 // Export as Vercel serverless function
 module.exports = app;
