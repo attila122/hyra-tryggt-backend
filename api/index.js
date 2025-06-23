@@ -13,6 +13,17 @@ const nodemailer = require('nodemailer');
 // Initialize Express app
 const app = express();
 
+// CORS configuration (ONLY ONE!)
+app.options('*', cors()); // Handle preflight requests 
+app.use(cors({
+  origin: '*', // Allow all origins temporarily for testing
+  credentials: false, // Turn off credentials temporarily
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+
 // Initialize Prisma
 let prisma;
 if (!global.prisma) {
@@ -85,14 +96,6 @@ const authLimiter = rateLimit({
   max: 10,
   message: { error: 'Too many login attempts, please try again later' }
 });
-
-// CORS configuration
-app.use(cors({
-  origin: true,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
