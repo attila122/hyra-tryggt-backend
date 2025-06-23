@@ -3,216 +3,461 @@
 <head>
     <title>Hyra Tryggt - Complete Rental Platform</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .form-group { margin: 10px 0; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group textarea, .form-group select { 
-            width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
-        }
-        .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; }
-        button { 
-            background: #007bff; color: white; padding: 10px 20px; border: none; 
-            border-radius: 4px; cursor: pointer; margin: 5px; 
-        }
-        button:hover { background: #0056b3; }
-        button.delete { background: #dc3545; }
-        button.delete:hover { background: #c82333; }
-        button.primary { background: #28a745; }
-        button.primary:hover { background: #218838; }
-        button.warning { background: #ffc107; color: #212529; }
-        button.warning:hover { background: #e0a800; }
-        .result { 
-            background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 4px; 
-            border-left: 4px solid #007bff; font-family: monospace; font-size: 12px;
-        }
-        .success { border-left-color: #28a745; }
-        .error { border-left-color: #dc3545; }
-        .token-display { 
-            background: #e9ecef; padding: 10px; border-radius: 4px; 
-            word-break: break-all; font-size: 12px; margin: 10px 0;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
         }
         
-        /* Property Card Styles */
-        .property-card { 
-            border: 1px solid #ddd; padding: 20px; margin: 15px 0; 
-            border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: box-shadow 0.3s ease;
+        /* Header Styles */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .property-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
         }
-        .property-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            margin-bottom: 15px;
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
         }
-        .property-title {
-            font-size: 20px; font-weight: bold; color: #333; margin: 0;
+        
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        .property-price {
-            font-size: 18px; font-weight: bold; color: #28a745;
-        }
-        .property-details {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px; margin: 15px 0;
-        }
-        .property-detail {
-            background: #f8f9fa; padding: 8px 12px; border-radius: 4px;
+        
+        .user-info {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
             font-size: 14px;
+            font-weight: 500;
         }
-        .property-description {
-            margin: 15px 0; color: #666; line-height: 1.5;
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
         }
-        .property-landlord {
-            background: #e7f3ff; padding: 10px; border-radius: 4px; margin-top: 15px;
+        
+        .auth-btn {
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .auth-btn.register {
+            background: #667eea;
+            color: white;
+        }
+        
+        .auth-btn.register:hover {
+            background: #5a6fd8;
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        /* Function Grid */
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .function-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .function-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .function-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .function-icon {
+            font-size: 32px;
+            margin-right: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+        }
+        
+        .function-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .function-subtitle {
+            color: #666;
             font-size: 14px;
+            margin-top: 5px;
         }
         
-        /* Application Styles */
-        .application-card {
-            border: 1px solid #ddd; padding: 15px; margin: 10px 0;
-            border-radius: 8px; background: white;
-        }
-        .application-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
-        }
-        .application-status {
-            padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
-        }
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-accepted { background: #d4edda; color: #155724; }
-        .status-rejected { background: #f8d7da; color: #721c24; }
-        .status-withdrawn { background: #e2e3e5; color: #383d41; }
-        
-        /* Image Gallery Styles */
-        .property-images {
+        /* Form Styles */
+        .form-group {
             margin: 15px 0;
         }
-        .image-gallery { 
-            display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; 
-        }
-        .image-item { 
-            position: relative; border: 2px solid #ddd; border-radius: 8px; 
-            overflow: hidden; width: 150px; height: 120px; cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .image-item:hover {
-            transform: scale(1.05);
-        }
-        .image-item img { 
-            width: 100%; height: 100%; object-fit: cover; 
-        }
-        .image-item.primary { 
-            border-color: #28a745; 
-        }
-        .image-controls { 
-            position: absolute; top: 5px; right: 5px; 
-            display: flex; gap: 2px;
-        }
-        .image-controls button { 
-            padding: 2px 6px; font-size: 10px; margin: 0; 
-        }
-        .image-upload { 
-            border: 2px dashed #ddd; padding: 40px; text-align: center; 
-            border-radius: 4px; margin: 10px 0; cursor: pointer;
-            background: #fafafa;
-        }
-        .image-upload:hover { 
-            border-color: #007bff; background: #f8f9ff; 
-        }
-        .primary-badge { 
-            background: #28a745; color: white; padding: 2px 6px; 
-            border-radius: 3px; font-size: 10px; 
-            position: absolute; bottom: 5px; left: 5px;
-        }
-        .no-image {
-            background: #f8f9fa; border: 2px dashed #ddd; padding: 20px;
-            text-align: center; color: #666; border-radius: 8px;
-        }
         
-        /* Modal Styles */
-        .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-            width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);
-        }
-        .modal-content {
-            margin: auto; display: block; width: 80%; max-width: 700px;
-            max-height: 80%; margin-top: 5%;
-        }
-        .close {
-            position: absolute; top: 15px; right: 35px; color: #f1f1f1;
-            font-size: 40px; font-weight: bold; cursor: pointer;
-        }
-        .close:hover { color: #bbb; }
-        
-        .filters { background: #e7f3ff; padding: 15px; border-radius: 4px; margin: 10px 0; }
-        h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
-        h3 { color: #666; }
-        .upload-section-hidden { display: none; }
-        .upload-section-visible { display: block; }
-        
-        .pagination {
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-            margin: 20px 0; padding: 20px;
-        }
-        .pagination button {
-            padding: 8px 12px; margin: 0;
-        }
-        .pagination .current-page {
-            background: #28a745; color: white; padding: 8px 12px; border-radius: 4px;
-        }
-        
-        .apply-form {
-            background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;
-            border: 1px solid #dee2e6;
-        }
-        
-        .tab-container {
-            display: flex; border-bottom: 1px solid #ddd; margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent;
-            background: #f8f9fa; margin-right: 5px; border-radius: 4px 4px 0 0;
-        }
-        .tab.active {
-            background: white; border-bottom-color: #007bff; color: #007bff; font-weight: bold;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
+        .form-group label {
             display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Results Display */
+        .result {
+            background: rgba(248, 249, 250, 0.9);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .result.success {
+            border-left-color: #28a745;
+            background: rgba(212, 237, 218, 0.3);
+        }
+        
+        .result.error {
+            border-left-color: #dc3545;
+            background: rgba(248, 215, 218, 0.3);
+        }
+        
+        /* Property Cards */
+        .property-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .property-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .property-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        .property-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        /* About Section */
+        .about-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .about-section h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #333;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .about-section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .contact-card {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .contact-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .functions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .auth-section {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Modal and other existing styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80%;
+            margin-top: 5%;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #bbb;
+        }
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🏠 Hyra Tryggt - Complete Rental Platform v3.0</h1>
-        
-        <!-- API Status -->
-        <div class="section">
-            <h2>📡 API Status</h2>
-            <button onclick="checkAPI()">Check API Health</button>
-            <button onclick="debugLogin()">🔍 Debug Login Status</button>
-            <div id="apiResult" class="result"></div>
+    <!-- Header with Authentication -->
+    <div class="header">
+        <div class="header-content">
+            <a href="#" class="logo">🏠 Hyra Tryggt</a>
+            <div class="auth-section">
+                <div id="userInfo" class="user-info hidden">
+                    <span id="userName">👤 Not logged in</span>
+                    <button class="btn btn-outline" onclick="logout()" style="margin-left: 10px; padding: 4px 12px; font-size: 12px;">Logout</button>
+                </div>
+                <div id="authButtons" class="auth-buttons">
+                    <button class="auth-btn" onclick="showLoginForm()">Login</button>
+                    <button class="auth-btn register" onclick="showRegisterForm()">Register</button>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <!-- Authentication -->
-        <div class="section">
-            <h2>🔐 Authentication</h2>
+    <div class="container">
+        <!-- Authentication Forms (Initially Hidden) -->
+        <div id="authForms" class="function-box hidden" style="max-width: 600px; margin: 0 auto 30px;">
+            <div class="function-header">
+                <div class="function-icon">🔐</div>
+                <div>
+                    <div class="function-title" id="authTitle">Login to Your Account</div>
+                    <div class="function-subtitle">Access your rental dashboard</div>
+                </div>
+            </div>
             
-            <h3>Register New User</h3>
-            <form id="registerForm">
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form">
                 <div class="form-row">
                     <div class="form-group">
                         <label>Email:</label>
-                        <input type="email" id="regEmail" placeholder="user@example.com" required>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
                     </div>
                     <div class="form-group">
-                        <label>Name:</label>
+                        <label>Password:</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">🔓 Login</button>
+                <button type="button" class="btn btn-outline" onclick="showRegisterForm()">Don't have an account? Register</button>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form hidden">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="regEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name:</label>
                         <input type="text" id="regName" placeholder="John Doe" required>
                     </div>
                 </div>
@@ -226,160 +471,173 @@
                         <input type="text" id="regPhone" placeholder="+46701234567">
                     </div>
                 </div>
-                <button type="submit">Register</button>
+                <button type="submit" class="btn btn-success">📝 Register</button>
+                <button type="button" class="btn btn-outline" onclick="showLoginForm()">Already have an account? Login</button>
             </form>
-            <div id="registerResult" class="result"></div>
-
-            <h3>Login</h3>
-            <form id="loginForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Email:</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password:</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                </div>
-                <button type="submit">Login</button>
-            </form>
-            <div id="loginResult" class="result"></div>
-            <div id="tokenDisplay" class="token-display" style="display: none;"></div>
+            
+            <div id="authResult" class="result"></div>
         </div>
 
-        <!-- Property Management -->
-        <div class="section">
-            <h2>🏡 Property Management</h2>
-            
-            <h3>Add New Property</h3>
-            <form id="propertyForm">
-                <div class="form-group">
-                    <label>Title:</label>
-                    <input type="text" id="propTitle" placeholder="Beautiful 2-room apartment in Södermalm" required>
-                </div>
-                <div class="form-group">
-                    <label>Description:</label>
-                    <textarea id="propDescription" rows="3" placeholder="Newly renovated apartment with modern kitchen and balcony..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Address:</label>
-                        <input type="text" id="propAddress" placeholder="Götgatan 15" required>
+        <!-- Main Functions Grid -->
+        <div class="functions-grid">
+            <!-- Property Search -->
+            <div class="function-box">
+                <div class="function-header">
+                    <div class="function-icon">🔍</div>
+                    <div>
+                        <div class="function-title">Property Search</div>
+                        <div class="function-subtitle">Find your perfect rental home</div>
                     </div>
-                    <div class="form-group">
-                        <label>City:</label>
-                        <input type="text" id="propCity" placeholder="Stockholm" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Monthly Rent (SEK):</label>
-                        <input type="number" id="propRent" placeholder="15000" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Rooms:</label>
-                        <input type="number" id="propRooms" placeholder="2" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Size (sqm):</label>
-                        <input type="number" id="propSize" placeholder="65" required>
-                    </div>
-                </div>
-                <button type="submit">Add Property</button>
-            </form>
-            <div id="propertyResult" class="result"></div>
-        </div>
-
-        <!-- IMAGE UPLOAD SECTION -->
-        <div class="section">
-            <h2>📸 Property Images</h2>
-            
-            <div class="form-group">
-                <label>Select Property for Image Upload:</label>
-                <select id="imagePropertySelect" style="margin-bottom: 10px;">
-                    <option value="">First, load your properties...</option>
-                </select>
-                <button onclick="loadPropertiesForImages()">🔄 Load My Properties</button>
-            </div>
-
-            <div id="imageUploadSection" class="upload-section-hidden">
-                <h3>📤 Upload New Images</h3>
-                <div class="image-upload" onclick="document.getElementById('imageInput').click()">
-                    <input type="file" id="imageInput" multiple accept="image/*" style="display: none;" onchange="previewImages()">
-                    <p style="font-size: 24px; margin: 10px 0;">📷</p>
-                    <p style="font-size: 16px; margin: 10px 0;"><strong>Click here to select images</strong></p>
-                    <p style="font-size: 12px; color: #666;">Max 10 images, 5MB each. JPG, PNG, GIF supported.</p>
                 </div>
                 
-                <div id="imagePreview" class="image-gallery"></div>
-                <button id="uploadBtn" onclick="uploadImages()" style="display: none; background: #28a745;">📤 Upload Images</button>
-                <div id="uploadResult" class="result"></div>
-
-                <h3>🖼️ Current Images</h3>
-                <button onclick="loadPropertyImages()">🔄 Refresh Images</button>
-                <div id="currentImages" class="image-gallery" style="min-height: 50px; border: 1px dashed #ddd; border-radius: 4px; padding: 20px;">
-                    <p style="color: #666; text-align: center;">Select a property and click "Refresh Images" to see current images</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- APPLICATION MANAGEMENT -->
-        <div class="section">
-            <h2>📋 Application Management</h2>
-            
-            <div class="tab-container">
-                <div class="tab active" onclick="switchTab('myApplications')">My Applications</div>
-                <div class="tab" onclick="switchTab('receivedApplications')">Received Applications</div>
-            </div>
-            
-            <div id="myApplications" class="tab-content active">
-                <h3>📨 My Applications</h3>
-                <p style="color: #666;">Properties you've applied to rent</p>
-                <button onclick="loadMyApplications()">🔄 Load My Applications</button>
-                <div id="myApplicationsList"></div>
-            </div>
-            
-            <div id="receivedApplications" class="tab-content">
-                <h3>📬 Received Applications</h3>
-                <p style="color: #666;">Applications for your properties</p>
-                <button onclick="loadReceivedApplications()">🔄 Load Received Applications</button>
-                <div id="receivedApplicationsList"></div>
-            </div>
-        </div>
-
-        <!-- PROPERTY SEARCH & APPLY -->
-        <div class="section">
-            <h2>🔍 Property Search & Apply</h2>
-            
-            <div class="filters">
-                <h3>Search Filters</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label>City:</label>
                         <input type="text" id="searchCity" placeholder="Stockholm">
                     </div>
                     <div class="form-group">
-                        <label>Min Rent:</label>
-                        <input type="number" id="searchMinRent" placeholder="5000">
-                    </div>
-                    <div class="form-group">
-                        <label>Max Rent:</label>
+                        <label>Max Rent (SEK):</label>
                         <input type="number" id="searchMaxRent" placeholder="20000">
                     </div>
                 </div>
-                <div class="form-row">
-                    <button onclick="searchProperties()">🔍 Search Properties</button>
-                    <button onclick="getAllProperties()">📋 Get All Properties</button>
-                    <button onclick="clearFilters()">🗑️ Clear Filters</button>
+                
+                <button class="btn btn-primary" onclick="searchProperties()">🔍 Search Properties</button>
+                <button class="btn btn-outline" onclick="getAllProperties()">📋 View All</button>
+                <button class="btn btn-outline" onclick="clearSearch()">🗑️ Clear</button>
+                
+                <div id="propertyResults" style="max-height: 400px; overflow-y: auto; margin-top: 20px;"></div>
+            </div>
+
+            <!-- Add Property -->
+            <div class="function-box">
+                <div class="function-header">
+                    <div class="function-icon">🏡</div>
+                    <div>
+                        <div class="function-title">List Your Property</div>
+                        <div class="function-subtitle">Rent out your apartment or house</div>
+                    </div>
+                </div>
+                
+                <form id="propertyForm">
+                    <div class="form-group">
+                        <label>Property Title:</label>
+                        <input type="text" id="propTitle" placeholder="Beautiful 2-room apartment in Södermalm" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Address:</label>
+                            <input type="text" id="propAddress" placeholder="Götgatan 15" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City:</label>
+                            <input type="text" id="propCity" placeholder="Stockholm" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Rent (SEK/month):</label>
+                            <input type="number" id="propRent" placeholder="15000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rooms:</label>
+                            <input type="number" id="propRooms" placeholder="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Size (sqm):</label>
+                            <input type="number" id="propSize" placeholder="65" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <textarea id="propDescription" rows="3" placeholder="Describe your property..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">🏠 List Property</button>
+                </form>
+                
+                <div id="propertyResult" class="result"></div>
+            </div>
+
+            <!-- Applications Manager -->
+            <div class="function-box">
+                <div class="function-header">
+                    <div class="function-icon">📋</div>
+                    <div>
+                        <div class="function-title">Application Manager</div>
+                        <div class="function-subtitle">Track your applications and manage requests</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="loadMyApplications()">📨 My Applications</button>
+                    <button class="btn btn-outline" onclick="loadReceivedApplications()">📬 Received</button>
+                </div>
+                
+                <div id="applicationResults" style="max-height: 400px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- System Status -->
+            <div class="function-box">
+                <div class="function-header">
+                    <div class="function-icon">📡</div>
+                    <div>
+                        <div class="function-title">System Status</div>
+                        <div class="function-subtitle">Check API connection and debug issues</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="checkAPI()">📡 Check API</button>
+                <button class="btn btn-outline" onclick="debugLogin()">🔍 Debug Status</button>
+                
+                <div id="apiResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- About & Contact Section -->
+        <div class="about-section">
+            <div class="about-content">
+                <h2>🏠 About Hyra Tryggt</h2>
+                <p>
+                    Hyra Tryggt is Sweden's most trusted rental platform, connecting landlords and tenants 
+                    in a secure and transparent environment. We make finding and renting properties 
+                    simple, safe, and stress-free.
+                </p>
+                <p>
+                    Our platform offers comprehensive tools for property listing, tenant screening, 
+                    application management, and secure communication between all parties.
+                </p>
+                
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <h4>📧 Email Support</h4>
+                        <p>info@hyratryggt.se</p>
+                        <p>Available 24/7</p>
+                    </div>
+                    <div class="contact-card">
+                        <h4>📞 Phone Support</h4>
+                        <p>+46 8 123 456 78</p>
+                        <p>Mon-Fri 9:00-18:00</p>
+                    </div>
+                    <div class="contact-card">
+                        <h4>💬 Live Chat</h4>
+                        <p>Available on website</p>
+                        <p>Response within 5 min</p>
+                    </div>
+                    <div class="contact-card">
+                        <h4>📍 Office</h4>
+                        <p>Vasagatan 12</p>
+                        <p>111 20 Stockholm</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="window.open('mailto:info@hyratryggt.se', '_blank')">
+                        📧 Contact Support
+                    </button>
+                    <button class="btn btn-outline" onclick="showHelp()">
+                        ❓ Help Center
+                    </button>
                 </div>
             </div>
-            
-            <!-- Property Results -->
-            <div id="propertyResults"></div>
-            
-            <!-- Pagination -->
-            <div id="pagination" class="pagination" style="display: none;"></div>
         </div>
     </div>
 
@@ -391,15 +649,53 @@
 
     <script>
         let currentToken = '';
+        let currentUser = null;
         let selectedPropertyId = null;
         let currentPage = 1;
-        // FIXED: Set the correct API base URL
         const API_BASE = 'https://hyra-tryggt-backend-pjo8-9sv216lfg-attila122s-projects.vercel.app';
+
+        // Authentication UI Management
+        function showLoginForm() {
+            document.getElementById('authForms').classList.remove('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('authTitle').textContent = 'Login to Your Account';
+            document.getElementById('authForms').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showRegisterForm() {
+            document.getElementById('authForms').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('authTitle').textContent = 'Create New Account';
+            document.getElementById('authForms').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateAuthUI() {
+            if (currentToken && currentUser) {
+                document.getElementById('userInfo').classList.remove('hidden');
+                document.getElementById('authButtons').classList.add('hidden');
+                document.getElementById('userName').textContent = `👤 ${currentUser.name}`;
+                document.getElementById('authForms').classList.add('hidden');
+            } else {
+                document.getElementById('userInfo').classList.add('hidden');
+                document.getElementById('authButtons').classList.remove('hidden');
+                document.getElementById('userName').textContent = '👤 Not logged in';
+            }
+        }
+
+        function logout() {
+            currentToken = '';
+            currentUser = null;
+            updateAuthUI();
+            alert('👋 Successfully logged out!');
+        }
 
         // Debug login status
         function debugLogin() {
             const status = {
                 isLoggedIn: !!currentToken,
+                user: currentUser ? `${currentUser.name} (${currentUser.email})` : 'None',
                 tokenExists: currentToken ? 'Yes' : 'No',
                 tokenPreview: currentToken ? currentToken.substring(0, 20) + '...' : 'None',
                 apiBase: API_BASE
@@ -407,107 +703,99 @@
             showResult('apiResult', status, !!currentToken);
         }
 
-        // API Health Check with better error handling and longer timeout
+        // API Health Check with better error handling
         async function checkAPI() {
             showResult('apiResult', { message: 'Testing API connection... (This may take 10-30 seconds for cold start)', status: 'checking' }, true);
             
-            // Test multiple endpoints with longer timeout
-            const endpoints = ['/', '/health'];
+            // Test multiple endpoints
+            const endpoints = ['/health', '/', '/api/health'];
             
             for (const endpoint of endpoints) {
                 try {
-                    console.log(`Checking API endpoint: ${API_BASE}${endpoint}`);
+                    console.log(`Testing endpoint: ${API_BASE}${endpoint}`);
                     
-                    // Create abort controller for timeout
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-                    
-                    const response = await fetch(`${API_BASE}${endpoint}`, {
-                        method: 'GET',
-                        mode: 'cors',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        signal: controller.signal
+                    const fetchWithTimeout = new Promise((resolve, reject) => {
+                        const timeoutId = setTimeout(() => {
+                            reject(new Error('Request timed out after 30 seconds'));
+                        }, 30000);
+                        
+                        fetch(`${API_BASE}${endpoint}`, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(response => {
+                            clearTimeout(timeoutId);
+                            resolve(response);
+                        }).catch(error => {
+                            clearTimeout(timeoutId);
+                            reject(error);
+                        });
                     });
                     
-                    clearTimeout(timeoutId);
+                    const response = await fetchWithTimeout;
+                    console.log(`Response from ${endpoint}:`, response.status, response.statusText);
                     
-                    console.log(`Response status for ${endpoint}:`, response.status);
-                    console.log(`Response headers for ${endpoint}:`, response.headers);
-                    
-                    if (!response.ok) {
-                        console.log(`Failed ${endpoint} with status ${response.status}, trying next...`);
-                        
-                        // If it's a 500 error, show more specific message
-                        if (response.status === 500) {
+                    if (response.ok) {
+                        try {
+                            const result = await response.json();
                             showResult('apiResult', { 
-                                error: `Server returned 500 error. This might be a deployment issue.`,
-                                suggestion: 'Check Vercel function logs for errors. The function might have crashed.',
-                                status: response.status,
-                                endpoint: endpoint
-                            }, false);
-                            return;
+                                ...result, 
+                                success: true,
+                                message: `✅ API is working! Connected via ${endpoint}`,
+                                status: 'Connected',
+                                endpoint: endpoint,
+                                responseStatus: response.status,
+                                timestamp: new Date().toLocaleString()
+                            }, true);
+                            return; // Success, exit the loop
+                        } catch (jsonError) {
+                            console.log(`JSON parse error for ${endpoint}:`, jsonError);
+                            // Try next endpoint
+                            continue;
                         }
+                    } else {
+                        console.log(`HTTP ${response.status} from ${endpoint}, trying next...`);
                         continue;
                     }
-                    
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        const text = await response.text();
-                        console.log(`Non-JSON response from ${endpoint}:`, text.substring(0, 200));
-                        
-                        // If we get HTML, it might be a Vercel error page
-                        if (text.includes('<!DOCTYPE html>')) {
-                            showResult('apiResult', { 
-                                error: 'Received HTML instead of JSON. Function might not be properly configured.',
-                                suggestion: 'Check if vercel.json is properly configured and the function is deployed correctly.',
-                                response: text.substring(0, 300) + '...'
-                            }, false);
-                            return;
-                        }
-                        continue;
-                    }
-                    
-                    const result = await response.json();
-                    showResult('apiResult', { 
-                        ...result, 
-                        endpoint: endpoint,
-                        success: true,
-                        message: `✅ API is working! Connected via ${endpoint}`,
-                        responseTime: 'Response received successfully'
-                    }, true);
-                    return; // Success, exit loop
                     
                 } catch (error) {
                     console.error(`Error testing ${endpoint}:`, error);
                     
-                    if (error.name === 'AbortError') {
+                    if (error.message.includes('timed out')) {
                         showResult('apiResult', { 
-                            error: 'Request timed out after 30 seconds. This suggests the function is not responding.',
-                            suggestion: 'Check Vercel deployment logs and ensure the function is properly deployed.',
-                            endpoint: endpoint
+                            error: 'Request timed out after 30 seconds',
+                            suggestion: 'The server might be in cold start. Try again in a moment.',
+                            status: 'Timeout',
+                            endpoint: endpoint,
+                            timestamp: new Date().toLocaleString()
+                        }, false);
+                        return;
+                    }
+                    
+                    // If it's the last endpoint, show the error
+                    if (endpoint === endpoints[endpoints.length - 1]) {
+                        showResult('apiResult', { 
+                            error: 'Failed to connect to API',
+                            details: error.message,
+                            suggestion: 'This could be due to: 1) Server is down 2) CORS issues 3) Network problems 4) Server cold start',
+                            apiUrl: API_BASE,
+                            testedEndpoints: endpoints,
+                            troubleshooting: [
+                                'Wait 60 seconds and try again (cold start)',
+                                'Check if the server is deployed on Vercel',
+                                'Verify the API_BASE URL is correct',
+                                'Check browser console for CORS errors'
+                            ],
+                            status: 'Failed',
+                            timestamp: new Date().toLocaleString()
                         }, false);
                         return;
                     }
                 }
             }
-            
-            // If we get here, all endpoints failed
-            showResult('apiResult', { 
-                error: 'All API endpoints failed. The function might not be deployed properly.',
-                suggestion: 'Try: 1) Check Vercel deployment status 2) Add vercel.json configuration 3) Check function logs',
-                apiUrl: API_BASE,
-                timestamp: new Date().toISOString(),
-                triedEndpoints: endpoints,
-                nextSteps: [
-                    'Add vercel.json to your project',
-                    'Check Vercel function logs',
-                    'Verify deployment completed successfully',
-                    'Try waiting 60 seconds and test again (cold start)'
-                ]
-            }, false);
         }
 
         // Register
@@ -529,9 +817,15 @@
                 });
 
                 const result = await response.json();
-                showResult('registerResult', result, response.ok);
+                showResult('authResult', result, response.ok);
+                
+                if (response.ok) {
+                    alert('✅ Registration successful! You can now login.');
+                    showLoginForm();
+                    document.getElementById('registerForm').reset();
+                }
             } catch (error) {
-                showResult('registerResult', { error: error.message }, false);
+                showResult('authResult', { error: error.message }, false);
             }
         });
 
@@ -552,24 +846,19 @@
                 });
 
                 const result = await response.json();
-                showResult('loginResult', result, response.ok);
+                showResult('authResult', result, response.ok);
                 
                 if (response.ok && result.token) {
                     currentToken = result.token;
-                    document.getElementById('tokenDisplay').style.display = 'block';
-                    document.getElementById('tokenDisplay').innerHTML = `<strong>🔑 Logged in as:</strong> ${result.user.name} (${result.user.email})`;
-                    
-                    // Show success message
-                    alert(`✅ Successfully logged in as ${result.user.name}!`);
-                    
-                    // Clear the form
+                    currentUser = result.user;
+                    updateAuthUI();
+                    alert(`✅ Welcome back, ${result.user.name}!`);
                     document.getElementById('loginForm').reset();
                 } else {
-                    // Show error
                     alert(`❌ Login failed: ${result.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                showResult('loginResult', { error: error.message }, false);
+                showResult('authResult', { error: error.message }, false);
                 alert(`❌ Login error: ${error.message}`);
             }
         });
@@ -580,6 +869,7 @@
             
             if (!currentToken) {
                 showResult('propertyResult', { error: 'Please login first' }, false);
+                alert('❌ Please login first to list properties');
                 return;
             }
             
@@ -608,218 +898,111 @@
                 
                 if (response.ok) {
                     document.getElementById('propertyForm').reset();
-                    loadPropertiesForImages();
+                    alert('🏠 Property listed successfully!');
                 }
             } catch (error) {
                 showResult('propertyResult', { error: error.message }, false);
             }
         });
 
-        // Load Properties for Image Upload
-        async function loadPropertiesForImages() {
-            if (!currentToken) {
-                showResult('uploadResult', { error: 'Please login first' }, false);
-                return;
-            }
+        // Search Properties
+        async function searchProperties(page = 1) {
+            currentPage = page;
+            
+            const params = new URLSearchParams();
+            
+            const city = document.getElementById('searchCity').value;
+            const maxRent = document.getElementById('searchMaxRent').value;
+            
+            if (city) params.append('city', city);
+            if (maxRent) params.append('maxRent', maxRent);
+            params.append('page', page);
+            params.append('limit', 10);
 
             try {
-                const response = await fetch(`${API_BASE}/my-properties`, {
-                    headers: { 'Authorization': `Bearer ${currentToken}` }
-                });
-
+                const response = await fetch(`${API_BASE}/properties?${params.toString()}`);
                 const result = await response.json();
                 
                 if (response.ok) {
-                    const select = document.getElementById('imagePropertySelect');
-                    select.innerHTML = '<option value="">Select a property...</option>';
-                    
-                    result.forEach(property => {
-                        const option = document.createElement('option');
-                        option.value = property.id;
-                        option.textContent = `${property.title} - ${property.city}`;
-                        select.appendChild(option);
-                    });
+                    displayProperties(result.properties || result);
                 } else {
-                    showResult('uploadResult', result, false);
+                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
                 }
             } catch (error) {
-                showResult('uploadResult', { error: error.message }, false);
+                document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
             }
         }
 
-        // Handle property selection for images
-        document.getElementById('imagePropertySelect').addEventListener('change', function() {
-            selectedPropertyId = this.value;
-            const uploadSection = document.getElementById('imageUploadSection');
-            
-            if (selectedPropertyId) {
-                uploadSection.className = 'upload-section-visible';
-                loadPropertyImages();
-            } else {
-                uploadSection.className = 'upload-section-hidden';
-            }
-        });
-
-        // Preview selected images
-        function previewImages() {
-            const input = document.getElementById('imageInput');
-            const preview = document.getElementById('imagePreview');
-            const uploadBtn = document.getElementById('uploadBtn');
-            
-            preview.innerHTML = '';
-            
-            if (input.files.length > 0) {
-                uploadBtn.style.display = 'block';
-                
-                for (let i = 0; i < input.files.length; i++) {
-                    const file = input.files[i];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        const imageItem = document.createElement('div');
-                        imageItem.className = 'image-item';
-                        imageItem.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview">
-                            <div style="position: absolute; bottom: 5px; left: 5px; background: rgba(0,0,0,0.7); color: white; padding: 2px 5px; font-size: 10px; border-radius: 2px;">
-                                ${file.name}
-                            </div>
-                        `;
-                        preview.appendChild(imageItem);
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            } else {
-                uploadBtn.style.display = 'none';
-            }
+        // Get All Properties
+        async function getAllProperties() {
+            document.getElementById('searchCity').value = '';
+            document.getElementById('searchMaxRent').value = '';
+            searchProperties(1);
         }
 
-        // Upload images
-        async function uploadImages() {
-            if (!currentToken || !selectedPropertyId) {
-                showResult('uploadResult', { error: 'Please login and select a property first' }, false);
+        // Clear Search
+        function clearSearch() {
+            document.getElementById('searchCity').value = '';
+            document.getElementById('searchMaxRent').value = '';
+            document.getElementById('propertyResults').innerHTML = '';
+        }
+
+        // Display Properties
+        function displayProperties(properties) {
+            const container = document.getElementById('propertyResults');
+            
+            if (!properties || properties.length === 0) {
+                container.innerHTML = '<div class="result">No properties found.</div>';
                 return;
             }
-
-            const input = document.getElementById('imageInput');
-            if (!input.files.length) {
-                showResult('uploadResult', { error: 'Please select images to upload' }, false);
-                return;
-            }
-
-            const formData = new FormData();
-            for (let i = 0; i < input.files.length; i++) {
-                formData.append('images', input.files[i]);
-            }
-
-            try {
-                const response = await fetch(`${API_BASE}/properties/${selectedPropertyId}/images`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${currentToken}`
-                    },
-                    body: formData
-                });
-
-                const result = await response.json();
-                showResult('uploadResult', result, response.ok);
+            
+            container.innerHTML = '';
+            
+            properties.forEach(property => {
+                const propertyCard = document.createElement('div');
+                propertyCard.className = 'property-card';
+                propertyCard.style.margin = '15px 0';
+                propertyCard.style.padding = '20px';
                 
-                if (response.ok) {
-                    input.value = '';
-                    document.getElementById('imagePreview').innerHTML = '';
-                    document.getElementById('uploadBtn').style.display = 'none';
-                    loadPropertyImages();
-                }
-            } catch (error) {
-                showResult('uploadResult', { error: error.message }, false);
-            }
-        }
-
-        // Load current property images
-        async function loadPropertyImages() {
-            if (!selectedPropertyId) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/properties/${selectedPropertyId}/images`);
-                const images = await response.json();
+                const applicationCount = property._count?.applications || 0;
                 
-                const container = document.getElementById('currentImages');
-                container.innerHTML = '';
-                
-                if (images.length === 0) {
-                    container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No images uploaded yet.</p>';
-                    return;
-                }
-                
-                images.forEach(image => {
-                    const imageItem = document.createElement('div');
-                    imageItem.className = `image-item ${image.isPrimary ? 'primary' : ''}`;
-                    imageItem.innerHTML = `
-                        <img src="${API_BASE}${image.url}" alt="${image.alt}" onclick="openModal('${API_BASE}${image.url}')">
-                        <div class="image-controls">
-                            ${!image.isPrimary ? `<button class="primary" onclick="setPrimaryImage(${image.id})">★</button>` : ''}
-                            <button class="delete" onclick="deleteImage(${image.id})">×</button>
+                propertyCard.innerHTML = `
+                    <div class="property-header">
+                        <h4 style="margin: 0; color: #333;">${property.title}</h4>
+                        <div class="property-price">${property.rent.toLocaleString()} SEK</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0;">
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            📍 ${property.address}, ${property.city}
                         </div>
-                        ${image.isPrimary ? '<div class="primary-badge">Primary</div>' : ''}
-                    `;
-                    container.appendChild(imageItem);
-                });
-            } catch (error) {
-                console.error('Error loading images:', error);
-            }
-        }
-
-        // Set primary image
-        async function setPrimaryImage(imageId) {
-            if (!currentToken) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/images/${imageId}/primary`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${currentToken}` }
-                });
-
-                if (response.ok) {
-                    loadPropertyImages();
-                }
-            } catch (error) {
-                console.error('Error setting primary image:', error);
-            }
-        }
-
-        // Delete image
-        async function deleteImage(imageId) {
-            if (!currentToken) return;
-            
-            if (!confirm('Are you sure you want to delete this image?')) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/images/${imageId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${currentToken}` }
-                });
-
-                if (response.ok) {
-                    loadPropertyImages();
-                }
-            } catch (error) {
-                console.error('Error deleting image:', error);
-            }
-        }
-
-        // APPLICATION FUNCTIONS
-
-        // Switch tabs
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            🏠 ${property.rooms} rooms
+                        </div>
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            📐 ${property.size} sqm
+                        </div>
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            👤 ${property.landlord.name}
+                        </div>
+                    </div>
+                    
+                    ${property.description ? `<p style="color: #666; margin: 15px 0;">${property.description}</p>` : ''}
+                    
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        ${currentToken ? 
+                            `<button class="btn btn-success" onclick="applyForProperty(${property.id})">📨 Apply Now</button>` : 
+                            `<button class="btn btn-warning" onclick="alert('Please login first!')">🔓 Login to Apply</button>`
+                        }
+                        <small style="display: block; margin-top: 8px; color: #666;">
+                            Contact: ${property.landlord.email}
+                            ${applicationCount > 0 ? ` • ${applicationCount} applications` : ''}
+                        </small>
+                    </div>
+                `;
+                
+                container.appendChild(propertyCard);
             });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
         }
 
         // Apply for property
@@ -845,20 +1028,19 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert('Application submitted successfully! 📧 The landlord will be notified by email.');
-                    searchProperties();
+                    alert('✅ Application submitted successfully! The landlord will be notified.');
                 } else {
-                    alert(`Error: ${result.error}`);
+                    alert(`❌ Error: ${result.error}`);
                 }
             } catch (error) {
-                alert(`Error: ${error.message}`);
+                alert(`❌ Error: ${error.message}`);
             }
         }
 
         // Load my applications
         async function loadMyApplications() {
             if (!currentToken) {
-                document.getElementById('myApplicationsList').innerHTML = '<p style="color: #dc3545;">Please login first</p>';
+                document.getElementById('applicationResults').innerHTML = '<div class="result error">Please login first</div>';
                 return;
             }
 
@@ -870,21 +1052,48 @@
                 const applications = await response.json();
                 
                 if (response.ok) {
-                    displayMyApplications(applications);
+                    displayApplications(applications, 'my');
                 } else {
-                    document.getElementById('myApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${applications.error}</p>`;
+                    document.getElementById('applicationResults').innerHTML = `<div class="result error">Error: ${applications.error}</div>`;
                 }
             } catch (error) {
-                document.getElementById('myApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
+                document.getElementById('applicationResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
             }
         }
 
-        // Display my applications
-        function displayMyApplications(applications) {
-            const container = document.getElementById('myApplicationsList');
+        // Load received applications
+        async function loadReceivedApplications() {
+            if (!currentToken) {
+                document.getElementById('applicationResults').innerHTML = '<div class="result error">Please login first</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/my-property-applications`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                const applications = await response.json();
+                
+                if (response.ok) {
+                    displayApplications(applications, 'received');
+                } else {
+                    document.getElementById('applicationResults').innerHTML = `<div class="result error">Error: ${applications.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('applicationResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Display applications
+        function displayApplications(applications, type) {
+            const container = document.getElementById('applicationResults');
             
             if (applications.length === 0) {
-                container.innerHTML = '<p style="color: #666;">You haven\'t applied to any properties yet.</p>';
+                const message = type === 'my' ? 
+                    "You haven't applied to any properties yet." : 
+                    "No applications received yet.";
+                container.innerHTML = `<div class="result">${message}</div>`;
                 return;
             }
 
@@ -892,28 +1101,85 @@
             
             applications.forEach(app => {
                 const appCard = document.createElement('div');
-                appCard.className = 'application-card';
-                
-                appCard.innerHTML = `
-                    <div class="application-header">
-                        <h4>${app.property.title}</h4>
-                        <span class="application-status status-${app.status.toLowerCase()}">${app.status}</span>
-                    </div>
-                    
-                    <div class="property-details">
-                        <div class="property-detail">📍 ${app.property.address}, ${app.property.city}</div>
-                        <div class="property-detail">💰 ${app.property.rent.toLocaleString()} SEK/month</div>
-                        <div class="property-detail">📅 Applied: ${new Date(app.createdAt).toLocaleDateString()}</div>
-                        <div class="property-detail">👤 Landlord: ${app.property.landlord.name}</div>
-                    </div>
-                    
-                    ${app.message ? `<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0;"><strong>Your message:</strong><br>${app.message}</div>` : ''}
-                    
-                    <div style="margin-top: 15px;">
-                        ${app.status === 'PENDING' ? `<button class="warning" onclick="withdrawApplication(${app.id})">↩️ Withdraw</button>` : ''}
-                        ${app.status === 'ACCEPTED' ? `<button class="primary">📧 Contact: ${app.property.landlord.email}</button>` : ''}
-                    </div>
+                appCard.style.cssText = `
+                    background: white; 
+                    border-radius: 12px; 
+                    padding: 20px; 
+                    margin: 15px 0; 
+                    border: 1px solid #e1e5e9;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
                 `;
+                
+                const statusColors = {
+                    PENDING: '#ffc107',
+                    ACCEPTED: '#28a745', 
+                    REJECTED: '#dc3545',
+                    WITHDRAWN: '#6c757d'
+                };
+                
+                if (type === 'my') {
+                    appCard.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h4 style="margin: 0; color: #333;">${app.property.title}</h4>
+                            <span style="background: ${statusColors[app.status]}; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                                ${app.status}
+                            </span>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0;">
+                            <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">
+                                📍 ${app.property.address}, ${app.property.city}
+                            </div>
+                            <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">
+                                💰 ${app.property.rent.toLocaleString()} SEK/month
+                            </div>
+                            <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">
+                                📅 Applied: ${new Date(app.createdAt).toLocaleDateString()}
+                            </div>
+                            <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">
+                                👤 Landlord: ${app.property.landlord.name}
+                            </div>
+                        </div>
+                        
+                        ${app.message ? `<div style="background: #e7f3ff; padding: 12px; border-radius: 8px; margin: 15px 0;"><strong>Your message:</strong><br>${app.message}</div>` : ''}
+                        
+                        <div style="margin-top: 15px;">
+                            ${app.status === 'PENDING' ? `<button class="btn btn-warning" onclick="withdrawApplication(${app.id})">↩️ Withdraw</button>` : ''}
+                            ${app.status === 'ACCEPTED' ? `<button class="btn btn-success" onclick="window.open('mailto:${app.property.landlord.email}', '_blank')">📧 Contact Landlord</button>` : ''}
+                        </div>
+                    `;
+                } else {
+                    appCard.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h4 style="margin: 0; color: #333;">Application for: ${app.property.title}</h4>
+                            <span style="background: ${statusColors[app.status]}; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                                ${app.status}
+                            </span>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0;">
+                            <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">
+                                👤 Applicant: ${app.user.name}
+                            </div>
+                            <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">
+                                📧 Email: ${app.user.email}
+                            </div>
+                            ${app.user.phone ? `<div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">📞 Phone: ${app.user.phone}</div>` : ''}
+                            <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 14px;">
+                                📅 Applied: ${new Date(app.createdAt).toLocaleDateString()}
+                            </div>
+                        </div>
+                        
+                        ${app.message ? `<div style="background: #e7f3ff; padding: 12px; border-radius: 8px; margin: 15px 0;"><strong>Message:</strong><br>${app.message}</div>` : ''}
+                        
+                        <div style="margin-top: 15px;">
+                            ${app.status === 'PENDING' ? `
+                                <button class="btn btn-success" onclick="updateApplicationStatus(${app.id}, 'ACCEPTED')">✅ Accept</button>
+                                <button class="btn btn-danger" onclick="updateApplicationStatus(${app.id}, 'REJECTED')">❌ Reject</button>
+                            ` : ''}
+                        </div>
+                    `;
+                }
                 
                 container.appendChild(appCard);
             });
@@ -932,80 +1198,14 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert('Application withdrawn successfully');
+                    alert('✅ Application withdrawn successfully');
                     loadMyApplications();
                 } else {
-                    alert(`Error: ${result.error}`);
+                    alert(`❌ Error: ${result.error}`);
                 }
             } catch (error) {
-                alert(`Error: ${error.message}`);
+                alert(`❌ Error: ${error.message}`);
             }
-        }
-
-        // Load received applications
-        async function loadReceivedApplications() {
-            if (!currentToken) {
-                document.getElementById('receivedApplicationsList').innerHTML = '<p style="color: #dc3545;">Please login first</p>';
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE}/my-property-applications`, {
-                    headers: { 'Authorization': `Bearer ${currentToken}` }
-                });
-
-                const applications = await response.json();
-                
-                if (response.ok) {
-                    displayReceivedApplications(applications);
-                } else {
-                    document.getElementById('receivedApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${applications.error}</p>`;
-                }
-            } catch (error) {
-                document.getElementById('receivedApplicationsList').innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
-            }
-        }
-
-        // Display received applications
-        function displayReceivedApplications(applications) {
-            const container = document.getElementById('receivedApplicationsList');
-            
-            if (applications.length === 0) {
-                container.innerHTML = '<p style="color: #666;">No applications received yet.</p>';
-                return;
-            }
-
-            container.innerHTML = '';
-            
-            applications.forEach(app => {
-                const appCard = document.createElement('div');
-                appCard.className = 'application-card';
-                
-                appCard.innerHTML = `
-                    <div class="application-header">
-                        <h4>Application for: ${app.property.title}</h4>
-                        <span class="application-status status-${app.status.toLowerCase()}">${app.status}</span>
-                    </div>
-                    
-                    <div class="property-details">
-                        <div class="property-detail">👤 Applicant: ${app.user.name}</div>
-                        <div class="property-detail">📧 Email: ${app.user.email}</div>
-                        ${app.user.phone ? `<div class="property-detail">📞 Phone: ${app.user.phone}</div>` : ''}
-                        <div class="property-detail">📅 Applied: ${new Date(app.createdAt).toLocaleDateString()}</div>
-                    </div>
-                    
-                    ${app.message ? `<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0;"><strong>Message:</strong><br>${app.message}</div>` : ''}
-                    
-                    <div style="margin-top: 15px;">
-                        ${app.status === 'PENDING' ? `
-                            <button class="primary" onclick="updateApplicationStatus(${app.id}, 'ACCEPTED')">✅ Accept</button>
-                            <button class="delete" onclick="updateApplicationStatus(${app.id}, 'REJECTED')">❌ Reject</button>
-                        ` : ''}
-                    </div>
-                `;
-                
-                container.appendChild(appCard);
-            });
         }
 
         // Update application status
@@ -1026,172 +1226,43 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert(`Application ${action}ed successfully! 📧 Applicant will be notified by email.`);
+                    alert(`✅ Application ${action}ed successfully! Applicant will be notified.`);
                     loadReceivedApplications();
                 } else {
-                    alert(`Error: ${result.error}`);
+                    alert(`❌ Error: ${result.error}`);
                 }
             } catch (error) {
-                alert(`Error: ${error.message}`);
+                alert(`❌ Error: ${error.message}`);
             }
         }
 
-        // Search Properties
-        async function searchProperties(page = 1) {
-            currentPage = page;
-            
-            const params = new URLSearchParams();
-            
-            const city = document.getElementById('searchCity').value;
-            const minRent = document.getElementById('searchMinRent').value;
-            const maxRent = document.getElementById('searchMaxRent').value;
-            
-            if (city) params.append('city', city);
-            if (minRent) params.append('minRent', minRent);
-            if (maxRent) params.append('maxRent', maxRent);
-            params.append('page', page);
-            params.append('limit', 20);
+        // Show Help
+        function showHelp() {
+            alert(`
+🏠 Hyra Tryggt Help
 
-            try {
-                const response = await fetch(`${API_BASE}/properties?${params.toString()}`);
-                const result = await response.json();
-                
-                if (response.ok) {
-                    displayProperties(result.properties);
-                    displayPagination(result.pagination);
-                } else {
-                    document.getElementById('propertyResults').innerHTML = `<div class="property-card"><p style="color: #dc3545;">Error: ${result.error}</p></div>`;
-                }
-            } catch (error) {
-                document.getElementById('propertyResults').innerHTML = `<div class="property-card"><p style="color: #dc3545;">Error: ${error.message}</p></div>`;
-            }
-        }
+🔍 Property Search:
+- Search for rentals by city and price range
+- View property details and contact landlords
+- Apply directly through the platform
 
-        // Get All Properties
-        async function getAllProperties() {
-            searchProperties(1);
-        }
+🏡 List Property:
+- Add your rental properties
+- Manage applications from tenants
+- Set rent prices and property details
 
-        // Display Properties
-        function displayProperties(properties) {
-            const container = document.getElementById('propertyResults');
-            
-            if (!properties || properties.length === 0) {
-                container.innerHTML = '<div class="property-card"><p style="text-align: center; color: #666;">No properties found.</p></div>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            
-            properties.forEach(property => {
-                const propertyCard = document.createElement('div');
-                propertyCard.className = 'property-card';
-                
-                const totalImages = property.images?.length || 0;
-                const applicationCount = property._count?.applications || 0;
-                
-                propertyCard.innerHTML = `
-                    <div class="property-header">
-                        <h3 class="property-title">${property.title}</h3>
-                        <div class="property-price">${property.rent.toLocaleString()} SEK/month</div>
-                    </div>
-                    
-                    <div class="property-details">
-                        <div class="property-detail">📍 ${property.address}, ${property.city}</div>
-                        <div class="property-detail">🏠 ${property.rooms} rooms</div>
-                        <div class="property-detail">📐 ${property.size} sqm</div>
-                        <div class="property-detail">👤 ${property.landlord.name}</div>
-                        ${applicationCount > 0 ? `<div class="property-detail">📨 ${applicationCount} applications</div>` : ''}
-                    </div>
-                    
-                    ${property.description ? `<div class="property-description">${property.description}</div>` : ''}
-                    
-                    <div class="property-images">
-                        ${totalImages > 0 ? `
-                            <h4>📷 Images (${totalImages})</h4>
-                            <div class="image-gallery">
-                                ${property.images.map(image => `
-                                    <div class="image-item ${image.isPrimary ? 'primary' : ''}" onclick="openModal('${API_BASE}${image.url}')">
-                                        <img src="${API_BASE}${image.url}" alt="${image.alt}">
-                                        ${image.isPrimary ? '<div class="primary-badge">Primary</div>' : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : `
-                            <div class="no-image">
-                                <p>📷 No images available</p>
-                            </div>
-                        `}
-                    </div>
-                    
-                    <div class="property-landlord">
-                        <strong>Contact:</strong> ${property.landlord.name} - ${property.landlord.email}
-                        <br>
-                        <div style="margin-top: 10px;">
-                            ${currentToken ? 
-                                `<button class="primary" onclick="applyForProperty(${property.id})">📨 Apply Now</button>` : 
-                                `<button class="warning" onclick="alert('Please login first to apply for properties!')">📨 Login Required</button>`
-                            }
-                            <small style="display: block; margin-top: 5px; color: #666;">
-                                ${currentToken ? '✅ You can apply for this property' : '⚠️ Login required to apply'}
-                            </small>
-                        </div>
-                    </div>
-                `;
-                
-                container.appendChild(propertyCard);
-            });
-        }
+📋 Applications:
+- Track your rental applications
+- Manage applications for your properties
+- Accept or reject tenant requests
 
-        // Display Pagination
-        function displayPagination(pagination) {
-            const container = document.getElementById('pagination');
-            
-            if (pagination.pages <= 1) {
-                container.style.display = 'none';
-                return;
-            }
-            
-            container.style.display = 'flex';
-            container.innerHTML = '';
-            
-            if (pagination.page > 1) {
-                const prevBtn = document.createElement('button');
-                prevBtn.textContent = '← Previous';
-                prevBtn.onclick = () => searchProperties(pagination.page - 1);
-                container.appendChild(prevBtn);
-            }
-            
-            const currentPage = document.createElement('div');
-            currentPage.className = 'current-page';
-            currentPage.textContent = pagination.page;
-            container.appendChild(currentPage);
-            
-            if (pagination.page < pagination.pages) {
-                const nextBtn = document.createElement('button');
-                nextBtn.textContent = 'Next →';
-                nextBtn.onclick = () => searchProperties(pagination.page + 1);
-                container.appendChild(nextBtn);
-            }
-            
-            const pageInfo = document.createElement('div');
-            pageInfo.innerHTML = `Page ${pagination.page} of ${pagination.pages} (${pagination.total} properties)`;
-            pageInfo.style.marginLeft = '20px';
-            pageInfo.style.padding = '8px';
-            pageInfo.style.color = '#666';
-            container.appendChild(pageInfo);
-        }
+📡 System Status:
+- Check if the platform is working
+- Debug connection issues
+- View your login status
 
-        // Clear Filters
-        function clearFilters() {
-            document.getElementById('searchCity').value = '';
-            document.getElementById('searchMinRent').value = '';
-            document.getElementById('searchMaxRent').value = '';
-            
-            document.getElementById('propertyResults').innerHTML = '';
-            document.getElementById('pagination').style.display = 'none';
-            
-            currentPage = 1;
+Need more help? Contact info@hyratryggt.se
+            `);
         }
 
         // Image Modal Functions
@@ -1213,20 +1284,7 @@
                 modal.style.display = 'none';
             }
         }
-        app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
 
-// Lägg till en catch-all route före module.exports
-app.use('*', (req, res) => {
-  res.status(404).json({ 
-    error: 'Endpoint not found',
-    path: req.originalUrl,
-    method: req.method,
-    timestamp: new Date().toISOString()
-  });
-});
         // Helper function to display results
         function showResult(elementId, data, success) {
             const element = document.getElementById(elementId);
@@ -1234,8 +1292,11 @@ app.use('*', (req, res) => {
             element.className = success ? 'result success' : 'result error';
         }
 
-        // Load API status on page load
-        checkAPI();
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            updateAuthUI();
+            checkAPI();
+        });
     </script>
 </body>
 </html>
