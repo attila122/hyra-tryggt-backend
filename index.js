@@ -23,14 +23,22 @@ app.use((req, res, next) => {
 // CORS configuration (ONLY ONE!)
 app.options('*', cors()); // Handle preflight requests 
 app.use(cors({
-  origin: '*', // Allow all origins temporarily for testing
-  credentials: false, // Turn off credentials temporarily
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: true, // Allow any origin
+  credentials: true, // Enable credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
+  allowedHeaders: ['*'], // Allow all headers
+  exposedHeaders: ['*'], // Expose all headers
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 200
 }));
 
+// Extra CORS headers for stubborn browsers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 // Initialize Prisma with error handling
 let prisma;
 try {
