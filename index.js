@@ -48,18 +48,7 @@ console.log(`Environment: ${isProduction ? 'production' : 'development'}`);
 
 // Configure email transporter
 let emailTransporter = null;
-if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-  emailTransporter = nodemailer.createTransporter({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-  console.log('Email transporter configured');
-} else {
-  console.log('Email not configured - missing EMAIL_USER or EMAIL_PASS');
-}
+console.log('Email disabled for testing - will add back later');
 
 // Send email notification
 async function sendEmail(to, subject, html) {
