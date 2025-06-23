@@ -13,6 +13,12 @@ const nodemailer = require('nodemailer');
 // Initialize Express app
 const app = express();
 
+// Add request logging for debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Headers:`, req.headers);
+  next();
+});
+
 // CORS configuration (ONLY ONE!)
 app.options('*', cors()); // Handle preflight requests 
 app.use(cors({
@@ -24,15 +30,21 @@ app.use(cors({
   optionsSuccessStatus: 204
 }));
 
-// Initialize Prisma
+// Initialize Prisma with error handling
 let prisma;
-if (!global.prisma) {
-  global.prisma = new PrismaClient();
+try {
+  if (!global.prisma) {
+    global.prisma = new PrismaClient();
+  }
+  prisma = global.prisma;
+  console.log('Prisma client initialized successfully');
+} catch (error) {
+  console.error('Prisma initialization error:', error);
 }
-prisma = global.prisma;
 
 // Environment check
 const isProduction = process.env.NODE_ENV === 'production';
+console.log(`Environment: ${isProduction ? 'production' : 'development'}`);
 
 // Configure email transporter
 let emailTransporter = null;
@@ -44,6 +56,9 @@ if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       pass: process.env.EMAIL_PASS
     }
   });
+  console.log('Email transporter configured');
+} else {
+  console.log('Email not configured - missing EMAIL_USER or EMAIL_PASS');
 }
 
 // Send email notification
@@ -137,38 +152,50 @@ const authenticateToken = (req, res, next) => {
 
 // Root endpoint
 app.get('/', (req, res) => {
+  console.log('Root endpoint called');
   res.json({ 
     message: 'Hyra Tryggt API is running!',
     version: '3.0.0',
     environment: isProduction ? 'production' : 'development',
+    timestamp: new Date().toISOString(),
     features: {
       authentication: true,
       properties: true,
       images: true,
       applications: true,
-      email: !!emailTransporter
+      email: !!emailTransporter,
+      prisma: !!prisma
     },
     endpoints: {
       auth: ['/register', '/login', '/profile'],
       properties: ['/properties', '/properties/:id', '/my-properties'],
       images: ['/properties/:id/images', '/images/:id'],
       applications: ['/applications', '/applications/:id', '/properties/:id/apply', '/my-applications']
+    },
+    serverInfo: {
+      nodeVersion: process.version,
+      platform: process.platform,
+      uptime: process.uptime()
     }
   });
 });
 
 // Health check
 app.get('/health', (req, res) => {
+  console.log('Health check called');
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     environment: isProduction ? 'production' : 'development',
-    emailConfigured: !!emailTransporter
+    emailConfigured: !!emailTransporter,
+    prismaConnected: !!prisma,
+    uptime: process.uptime()
   });
 });
 
 // Register new user
 app.post('/register', authLimiter, async (req, res) => {
+  console.log('Register endpoint called');
   try {
     const { email, password, name, phone } = req.body;
     
@@ -219,12 +246,13 @@ app.post('/register', authLimiter, async (req, res) => {
     
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
 // Login user
 app.post('/login', authLimiter, async (req, res) => {
+  console.log('Login endpoint called');
   try {
     const { email, password } = req.body;
     
@@ -264,7 +292,7 @@ app.post('/login', authLimiter, async (req, res) => {
     
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -295,7 +323,7 @@ app.get('/profile', authenticateToken, async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error('Profile error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -337,7 +365,7 @@ app.post('/properties', authenticateToken, async (req, res) => {
     
   } catch (error) {
     console.error('Property creation error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -401,7 +429,7 @@ app.get('/properties', async (req, res) => {
     });
   } catch (error) {
     console.error('Get properties error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -427,7 +455,7 @@ app.get('/my-properties', authenticateToken, async (req, res) => {
     res.json(properties);
   } catch (error) {
     console.error('Get my properties error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -495,7 +523,7 @@ app.post('/properties/:id/apply', authenticateToken, async (req, res) => {
     
   } catch (error) {
     console.error('Application error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -523,7 +551,7 @@ app.get('/my-applications', authenticateToken, async (req, res) => {
     res.json(applications);
   } catch (error) {
     console.error('Get my applications error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -550,7 +578,7 @@ app.get('/my-property-applications', authenticateToken, async (req, res) => {
     res.json(applications);
   } catch (error) {
     console.error('Get property applications error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -600,7 +628,7 @@ app.put('/applications/:id', authenticateToken, async (req, res) => {
     
   } catch (error) {
     console.error('Update application error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -634,15 +662,51 @@ app.delete('/applications/:id', authenticateToken, async (req, res) => {
     
   } catch (error) {
     console.error('Withdraw application error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
+});
+
+// Add a catch-all route for debugging
+app.use('*', (req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ 
+    error: 'Endpoint not found',
+    path: req.originalUrl,
+    method: req.method,
+    timestamp: new Date().toISOString(),
+    availableEndpoints: [
+      'GET /',
+      'GET /health',
+      'POST /register',
+      'POST /login',
+      'GET /profile',
+      'GET /properties',
+      'POST /properties',
+      'GET /my-properties'
+    ]
+  });
 });
 
 // Error handling
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(500).json({ 
+    error: 'Internal server error',
+    details: err.message,
+    timestamp: new Date().toISOString()
+  });
 });
+
+// Graceful shutdown handling
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  if (prisma) {
+    await prisma.$disconnect();
+  }
+  process.exit(0);
+});
+
+console.log('Server initialized successfully');
 
 // Export as Vercel serverless function
 module.exports = app;

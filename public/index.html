@@ -407,16 +407,20 @@
             showResult('apiResult', status, !!currentToken);
         }
 
-        // API Health Check with better error handling
+        // API Health Check with better error handling and longer timeout
         async function checkAPI() {
-            showResult('apiResult', { message: 'Testing API connection...', status: 'checking' }, true);
+            showResult('apiResult', { message: 'Testing API connection... (This may take 10-30 seconds for cold start)', status: 'checking' }, true);
             
-            // Test multiple endpoints
+            // Test multiple endpoints with longer timeout
             const endpoints = ['/', '/health'];
             
             for (const endpoint of endpoints) {
                 try {
                     console.log(`Checking API endpoint: ${API_BASE}${endpoint}`);
+                    
+                    // Create abort controller for timeout
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
                     
                     const response = await fetch(`${API_BASE}${endpoint}`, {
                         method: 'GET',
@@ -424,14 +428,28 @@
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        signal: controller.signal
                     });
+                    
+                    clearTimeout(timeoutId);
                     
                     console.log(`Response status for ${endpoint}:`, response.status);
                     console.log(`Response headers for ${endpoint}:`, response.headers);
                     
                     if (!response.ok) {
-                        console.log(`Failed ${endpoint}, trying next...`);
+                        console.log(`Failed ${endpoint} with status ${response.status}, trying next...`);
+                        
+                        // If it's a 500 error, show more specific message
+                        if (response.status === 500) {
+                            showResult('apiResult', { 
+                                error: `Server returned 500 error. This might be a deployment issue.`,
+                                suggestion: 'Check Vercel function logs for errors. The function might have crashed.',
+                                status: response.status,
+                                endpoint: endpoint
+                            }, false);
+                            return;
+                        }
                         continue;
                     }
                     
@@ -439,6 +457,16 @@
                     if (!contentType || !contentType.includes('application/json')) {
                         const text = await response.text();
                         console.log(`Non-JSON response from ${endpoint}:`, text.substring(0, 200));
+                        
+                        // If we get HTML, it might be a Vercel error page
+                        if (text.includes('<!DOCTYPE html>')) {
+                            showResult('apiResult', { 
+                                error: 'Received HTML instead of JSON. Function might not be properly configured.',
+                                suggestion: 'Check if vercel.json is properly configured and the function is deployed correctly.',
+                                response: text.substring(0, 300) + '...'
+                            }, false);
+                            return;
+                        }
                         continue;
                     }
                     
@@ -447,22 +475,38 @@
                         ...result, 
                         endpoint: endpoint,
                         success: true,
-                        message: `✅ API is working! Connected via ${endpoint}`
+                        message: `✅ API is working! Connected via ${endpoint}`,
+                        responseTime: 'Response received successfully'
                     }, true);
                     return; // Success, exit loop
                     
                 } catch (error) {
                     console.error(`Error testing ${endpoint}:`, error);
+                    
+                    if (error.name === 'AbortError') {
+                        showResult('apiResult', { 
+                            error: 'Request timed out after 30 seconds. This suggests the function is not responding.',
+                            suggestion: 'Check Vercel deployment logs and ensure the function is properly deployed.',
+                            endpoint: endpoint
+                        }, false);
+                        return;
+                    }
                 }
             }
             
             // If we get here, all endpoints failed
             showResult('apiResult', { 
-                error: 'All API endpoints failed. The server might be sleeping or there\'s a CORS issue.',
-                suggestion: 'Try again in a few seconds, or check Vercel deployment logs.',
+                error: 'All API endpoints failed. The function might not be deployed properly.',
+                suggestion: 'Try: 1) Check Vercel deployment status 2) Add vercel.json configuration 3) Check function logs',
                 apiUrl: API_BASE,
                 timestamp: new Date().toISOString(),
-                triedEndpoints: endpoints
+                triedEndpoints: endpoints,
+                nextSteps: [
+                    'Add vercel.json to your project',
+                    'Check Vercel function logs',
+                    'Verify deployment completed successfully',
+                    'Try waiting 60 seconds and test again (cold start)'
+                ]
             }, false);
         }
 
@@ -1169,7 +1213,20 @@
                 modal.style.display = 'none';
             }
         }
+        app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
 
+// Lägg till en catch-all route före module.exports
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    error: 'Endpoint not found',
+    path: req.originalUrl,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
+});
         // Helper function to display results
         function showResult(elementId, data, success) {
             const element = document.getElementById(elementId);
