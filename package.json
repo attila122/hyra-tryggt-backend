@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "npx prisma generate",
+    "build": "echo 'Prisma Client already generated in postinstall'",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
@@ -31,7 +31,7 @@
   },
   "keywords": [
     "rental",
-    "property",
+    "property", 
     "api",
     "express",
     "prisma",
