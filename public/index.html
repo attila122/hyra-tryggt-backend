@@ -221,50 +221,6 @@
             gap: 15px;
         }
         
-        /* Enhanced Form Elements */
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            border: 1px solid #e1e5e9;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .checkbox-item:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: #667eea;
-        }
-        
-        .file-upload {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            background: rgba(102, 126, 234, 0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .file-upload:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: #5a67d8;
-        }
-        
-        .file-upload.dragover {
-            background: rgba(102, 126, 234, 0.2);
-            border-color: #4c51bf;
-        }
-        
         /* Button Styles */
         .btn {
             padding: 12px 24px;
@@ -326,27 +282,6 @@
             font-weight: bold;
             display: inline-block;
             margin: 5px;
-        }
-        
-        /* Trust Indicators */
-        .trust-indicators {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .trust-item {
-            background: rgba(40, 167, 69, 0.1);
-            border: 1px solid rgba(40, 167, 69, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .trust-item h4 {
-            color: #28a745;
-            margin-bottom: 5px;
         }
         
         /* Results Display */
@@ -411,85 +346,6 @@
             border-radius: 20px;
         }
         
-        /* Photo Gallery */
-        .photo-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .photo-thumbnail {
-            width: 100%;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .photo-thumbnail:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        /* Verification Status */
-        .verification-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 15px;
-            background: rgba(248, 249, 250, 0.8);
-            border-radius: 10px;
-            border: 1px solid #e1e5e9;
-        }
-        
-        .verification-status.verified {
-            background: rgba(40, 167, 69, 0.1);
-            border-color: #28a745;
-        }
-        
-        .verification-status.pending {
-            background: rgba(255, 193, 7, 0.1);
-            border-color: #ffc107;
-        }
-        
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.9);
-        }
-        
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            max-height: 80%;
-            margin-top: 5%;
-        }
-        
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover {
-            color: #bbb;
-        }
-        
         .hidden {
             display: none;
         }
@@ -544,8 +400,6 @@
             <button class="nav-tab active" onclick="showTab('search')">🔍 Search Properties</button>
             <button class="nav-tab" onclick="showTab('list')">🏠 List Property</button>
             <button class="nav-tab" onclick="showTab('applications')">📋 Applications</button>
-            <button class="nav-tab" onclick="showTab('safety')">🛡️ Safety Center</button>
-            <button class="nav-tab" onclick="showTab('verification')">✅ Verification</button>
             <button class="nav-tab" onclick="showTab('analytics')">📊 Analytics</button>
         </div>
     </div>
@@ -592,16 +446,12 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Password:</label>
-                        <input type="password" id="regPassword" placeholder="Min 8 characters" required>
+                        <input type="password" id="regPassword" placeholder="Min 6 characters" required>
                     </div>
                     <div class="form-group">
                         <label>Phone:</label>
-                        <input type="text" id="regPhone" placeholder="+46701234567" required>
+                        <input type="text" id="regPhone" placeholder="+46701234567">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Personal Number (for verification):</label>
-                    <input type="text" id="regPersonalNumber" placeholder="YYYYMMDD-XXXX">
                 </div>
                 <button type="submit" class="btn btn-success">📝 Create Secure Account</button>
                 <button type="button" class="btn btn-outline" onclick="showLoginForm()">Already have account?</button>
@@ -645,37 +495,14 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Property Type:</label>
-                            <select id="searchPropertyType">
+                            <label>Max Rooms:</label>
+                            <select id="searchMaxRooms">
                                 <option value="">Any</option>
-                                <option value="apartment">Apartment</option>
-                                <option value="house">House</option>
-                                <option value="studio">Studio</option>
-                                <option value="room">Room</option>
+                                <option value="2">2 rooms</option>
+                                <option value="3">3 rooms</option>
+                                <option value="4">4 rooms</option>
+                                <option value="5">5+ rooms</option>
                             </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Safety Filters -->
-                    <div class="form-group">
-                        <label style="font-weight: bold; color: #28a745;">🛡️ Safety Preferences:</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="verifiedOnly" style="margin-right: 8px;">
-                                <span>✅ Verified landlords only</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="rentGuaranteeOnly" style="margin-right: 8px;">
-                                <span>🛡️ Rent guarantee available</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="noDepositOnly" style="margin-right: 8px;">
-                                <span>💳 No deposit required</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="insuranceIncluded" style="margin-right: 8px;">
-                                <span>🏠 Insurance included</span>
-                            </label>
                         </div>
                     </div>
                     
@@ -688,220 +515,82 @@
                     <div id="propertyResults" style="max-height: 600px; overflow-y: auto; margin-top: 20px;"></div>
                 </div>
 
-                <!-- Featured Properties -->
+                <!-- My Properties -->
                 <div class="function-box">
                     <div class="function-header">
-                        <div class="function-icon">⭐</div>
+                        <div class="function-icon">🏠</div>
                         <div>
-                            <div class="function-title">Featured & Safe Properties</div>
-                            <div class="function-subtitle">Verified listings with safety guarantees</div>
+                            <div class="function-title">My Properties</div>
+                            <div class="function-subtitle">Manage your property listings</div>
                         </div>
                     </div>
                     
-                    <div class="trust-indicators">
-                        <div class="trust-item">
-                            <h4>🛡️ Rent Guarantee</h4>
-                            <p>Up to 12 months protection</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>✅ Verified Owners</h4>
-                            <p>Identity & ownership confirmed</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>🏠 Insurance</h4>
-                            <p>Property & tenant protection</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>💳 Flexible Payment</h4>
-                            <p>No deposit for qualified tenants</p>
-                        </div>
-                    </div>
+                    <button class="btn btn-primary" onclick="loadMyProperties()">📋 View My Properties</button>
+                    <button class="btn btn-outline" onclick="showTab('list')">➕ Add New Property</button>
                     
-                    <button class="btn btn-success" onclick="loadFeaturedProperties()">⭐ View Featured Properties</button>
-                    <button class="btn btn-outline" onclick="showSafetyInfo()">🛡️ Learn About Safety</button>
-                    
-                    <div id="featuredResults"></div>
+                    <div id="myPropertiesResults"></div>
                 </div>
             </div>
         </div>
 
         <!-- List Property Tab -->
         <div id="listTab" class="tab-content">
-            <div class="functions-grid">
-                <div class="function-box">
-                    <div class="function-header">
-                        <div class="function-icon">🏡</div>
-                        <div>
-                            <div class="function-title">List Your Property</div>
-                            <div class="function-subtitle">Professional listing with safety features</div>
+            <div class="function-box" style="max-width: 800px; margin: 0 auto;">
+                <div class="function-header">
+                    <div class="function-icon">🏡</div>
+                    <div>
+                        <div class="function-title">List Your Property</div>
+                        <div class="function-subtitle">Professional listing</div>
+                    </div>
+                </div>
+                
+                <form id="propertyForm">
+                    <div class="form-group">
+                        <label>Property Title:</label>
+                        <input type="text" id="propTitle" placeholder="Beautiful 3-room apartment in Södermalm" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Address:</label>
+                            <input type="text" id="propAddress" placeholder="Götgatan 15" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City:</label>
+                            <input type="text" id="propCity" placeholder="Stockholm" required>
                         </div>
                     </div>
                     
-                    <form id="propertyForm">
+                    <div class="form-row">
                         <div class="form-group">
-                            <label>Property Title:</label>
-                            <input type="text" id="propTitle" placeholder="Beautiful 3-room apartment in Södermalm" required>
+                            <label>Monthly Rent (SEK):</label>
+                            <input type="number" id="propRent" placeholder="18000" required>
                         </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Address:</label>
-                                <input type="text" id="propAddress" placeholder="Götgatan 15" required>
-                            </div>
-                            <div class="form-group">
-                                <label>City:</label>
-                                <input type="text" id="propCity" placeholder="Stockholm" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Postal Code:</label>
-                                <input type="text" id="propPostalCode" placeholder="11846" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Monthly Rent (SEK):</label>
-                                <input type="number" id="propRent" placeholder="18000" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Rooms:</label>
-                                <input type="number" id="propRooms" placeholder="3" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Size (sqm):</label>
-                                <input type="number" id="propSize" placeholder="75" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Property Type:</label>
-                                <select id="propType" required>
-                                    <option value="">Select type</option>
-                                    <option value="apartment">Apartment</option>
-                                    <option value="house">House</option>
-                                    <option value="studio">Studio</option>
-                                    <option value="room">Room</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <!-- Enhanced Property Features -->
                         <div class="form-group">
-                            <label>Amenities & Features:</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="furnished" style="margin-right: 8px;">
-                                    <span>🛋️ Furnished</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="balcony" style="margin-right: 8px;">
-                                    <span>🌿 Balcony/Terrace</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="parking" style="margin-right: 8px;">
-                                    <span>🚗 Parking</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="elevator" style="margin-right: 8px;">
-                                    <span>🛗 Elevator</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="dishwasher" style="margin-right: 8px;">
-                                    <span>🧽 Dishwasher</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="laundry" style="margin-right: 8px;">
-                                    <span>👕 Laundry</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="pets" style="margin-right: 8px;">
-                                    <span>🐕 Pet-friendly</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" name="amenities" value="wifi" style="margin-right: 8px;">
-                                    <span>📶 WiFi included</span>
-                                </label>
-                            </div>
+                            <label>Rooms:</label>
+                            <input type="number" id="propRooms" placeholder="3" required>
                         </div>
-                        
-                        <!-- Photo Upload -->
                         <div class="form-group">
-                            <label>Property Photos:</label>
-                            <div class="file-upload" id="photoUpload" onclick="document.getElementById('photoInput').click()">
-                                <div>📸 Click or drag photos here</div>
-                                <div style="font-size: 12px; color: #666; margin-top: 10px;">
-                                    Upload up to 10 photos (JPG, PNG, max 5MB each)
-                                </div>
-                            </div>
-                            <input type="file" id="photoInput" multiple accept="image/*" style="display: none;">
-                            <div id="photoPreview" class="photo-gallery"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Property Description:</label>
-                            <textarea id="propDescription" rows="4" placeholder="Describe your property in detail - location benefits, nearby amenities, transportation, special features..."></textarea>
-                        </div>
-                        
-                        <!-- Safety & Trust Options -->
-                        <div class="form-group">
-                            <label style="font-weight: bold; color: #28a745;">🛡️ Safety & Trust Options:</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="rentGuarantee" style="margin-right: 8px;">
-                                    <span>🛡️ Enable rent guarantee (12 months protection)</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="noDeposit" style="margin-right: 8px;">
-                                    <span>💳 No deposit for qualified tenants</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="includeInsurance" style="margin-right: 8px;">
-                                    <span>🏠 Include 30-day property insurance</span>
-                                </label>
-                                <label class="checkbox-item">
-                                    <input type="checkbox" id="tenantScreening" style="margin-right: 8px;">
-                                    <span>✅ Require tenant verification</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Available From:</label>
-                                <input type="date" id="propAvailableFrom" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Lease Duration:</label>
-                                <select id="propLeaseDuration">
-                                    <option value="flexible">Flexible</option>
-                                    <option value="6months">6 months</option>
-                                    <option value="12months">12 months</option>
-                                    <option value="24months">24 months</option>
-                                    <option value="long-term">Long-term (2+ years)</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success">🏠 List Property Securely</button>
-                        <button type="button" class="btn btn-outline" onclick="previewListing()">👁️ Preview Listing</button>
-                    </form>
-                    
-                    <div id="propertyResult" class="result"></div>
-                </div>
-
-                <!-- Listing Management -->
-                <div class="function-box">
-                    <div class="function-header">
-                        <div class="function-icon">📊</div>
-                        <div>
-                            <div class="function-title">My Listings</div>
-                            <div class="function-subtitle">Manage your property listings</div>
+                            <label>Size (sqm):</label>
+                            <input type="number" id="propSize" placeholder="75" required>
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary" onclick="loadMyListings()">📋 View My Properties</button>
-                    <button class="btn btn-outline" onclick="loadListingAnalytics()">📊 View Analytics</button>
+                    <div class="form-group">
+                        <label>Available From:</label>
+                        <input type="date" id="propAvailableFrom" required>
+                    </div>
                     
-                    <div id="myListingsResults"></div>
-                </div>
+                    <div class="form-group">
+                        <label>Property Description:</label>
+                        <textarea id="propDescription" rows="4" placeholder="Describe your property in detail..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">🏠 List Property</button>
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('propertyForm').reset()">🗑️ Clear Form</button>
+                </form>
+                
+                <div id="propertyResult" class="result"></div>
             </div>
         </div>
 
@@ -910,235 +599,30 @@
             <div class="functions-grid">
                 <div class="function-box">
                     <div class="function-header">
-                        <div class="function-icon">📋</div>
+                        <div class="function-icon">📨</div>
                         <div>
-                            <div class="function-title">Application Manager</div>
-                            <div class="function-subtitle">Track and manage rental applications</div>
+                            <div class="function-title">My Applications</div>
+                            <div class="function-subtitle">Track your rental applications</div>
                         </div>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="loadMyApplications()">📨 My Applications</button>
-                        <button class="btn btn-outline" onclick="loadReceivedApplications()">📬 Received Applications</button>
-                        <button class="btn btn-warning" onclick="loadPendingApplications()">⏳ Pending Review</button>
-                    </div>
+                    <button class="btn btn-primary" onclick="loadMyApplications()">📨 View My Applications</button>
                     
-                    <div id="applicationResults" style="max-height: 600px; overflow-y: auto;"></div>
+                    <div id="myApplicationsResults"></div>
                 </div>
 
-                <!-- Application Statistics -->
                 <div class="function-box">
                     <div class="function-header">
-                        <div class="function-icon">📈</div>
+                        <div class="function-icon">📬</div>
                         <div>
-                            <div class="function-title">Application Statistics</div>
-                            <div class="function-subtitle">Your application performance</div>
+                            <div class="function-title">Property Applications</div>
+                            <div class="function-subtitle">Applications for your properties</div>
                         </div>
                     </div>
                     
-                    <div id="applicationStats" class="trust-indicators">
-                        <div class="trust-item">
-                            <h4>📨 Total Applied</h4>
-                            <p id="totalApplied">Loading...</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>✅ Accepted</h4>
-                            <p id="totalAccepted">Loading...</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>⏳ Pending</h4>
-                            <p id="totalPending">Loading...</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>📊 Success Rate</h4>
-                            <p id="successRate">Loading...</p>
-                        </div>
-                    </div>
+                    <button class="btn btn-primary" onclick="loadPropertyApplications()">📬 View Applications</button>
                     
-                    <button class="btn btn-primary" onclick="loadApplicationStats()">📊 Refresh Stats</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Safety Center Tab -->
-        <div id="safetyTab" class="tab-content">
-            <div class="functions-grid">
-                <div class="function-box">
-                    <div class="function-header">
-                        <div class="function-icon">🛡️</div>
-                        <div>
-                            <div class="function-title">Safety Center</div>
-                            <div class="function-subtitle">Your protection and security hub</div>
-                        </div>
-                    </div>
-                    
-                    <div class="trust-indicators">
-                        <div class="trust-item">
-                            <h4>🛡️ Rent Guarantee</h4>
-                            <p>Up to 12 months rent protection for landlords</p>
-                            <button class="btn btn-outline" onclick="showRentGuaranteeInfo()">Learn More</button>
-                        </div>
-                        <div class="trust-item">
-                            <h4>🏠 Property Insurance</h4>
-                            <p>Comprehensive coverage for damages and liability</p>
-                            <button class="btn btn-outline" onclick="showInsuranceInfo()">Get Quote</button>
-                        </div>
-                        <div class="trust-item">
-                            <h4>✅ Identity Verification</h4>
-                            <p>Bank-grade verification for all users</p>
-                            <button class="btn btn-outline" onclick="startVerification()">Verify Now</button>
-                        </div>
-                        <div class="trust-item">
-                            <h4>💳 Secure Payments</h4>
-                            <p>Escrow service and payment protection</p>
-                            <button class="btn btn-outline" onclick="showPaymentInfo()">View Details</button>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 30px;">
-                        <h3>🔒 Security Features</h3>
-                        <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px; margin: 15px 0;">
-                            <ul style="list-style: none; padding: 0;">
-                                <li style="padding: 8px 0;"><strong>🔐 End-to-end encryption</strong> - All communications secured</li>
-                                <li style="padding: 8px 0;"><strong>🏦 Bank-level security</strong> - PCI DSS compliant payments</li>
-                                <li style="padding: 8px 0;"><strong>🆔 Identity verification</strong> - BankID and manual verification</li>
-                                <li style="padding: 8px 0;"><strong>📱 Two-factor authentication</strong> - Extra account protection</li>
-                                <li style="padding: 8px 0;"><strong>🛡️ Fraud protection</strong> - AI-powered fraud detection</li>
-                                <li style="padding: 8px 0;"><strong>📞 24/7 support</strong> - Always available help</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Report Issues -->
-                <div class="function-box">
-                    <div class="function-header">
-                        <div class="function-icon">🚨</div>
-                        <div>
-                            <div class="function-title">Report Safety Issues</div>
-                            <div class="function-subtitle">Report fraud, scams, or safety concerns</div>
-                        </div>
-                    </div>
-                    
-                    <form id="reportForm">
-                        <div class="form-group">
-                            <label>Issue Type:</label>
-                            <select id="issueType" required>
-                                <option value="">Select issue type</option>
-                                <option value="fraud">💰 Suspected fraud/scam</option>
-                                <option value="fake-listing">🏠 Fake property listing</option>
-                                <option value="inappropriate">⚠️ Inappropriate behavior</option>
-                                <option value="safety">🚨 Safety concern</option>
-                                <option value="payment">💳 Payment issue</option>
-                                <option value="other">❓ Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Description:</label>
-                            <textarea id="issueDescription" rows="4" placeholder="Please describe the issue in detail..." required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Evidence (screenshots, documents):</label>
-                            <input type="file" id="evidenceFiles" multiple accept="image/*,.pdf,.doc,.docx">
-                        </div>
-                        
-                        <button type="submit" class="btn btn-danger">🚨 Report Issue</button>
-                    </form>
-                    
-                    <div id="reportResult" class="result"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Verification Tab -->
-        <div id="verificationTab" class="tab-content">
-            <div class="functions-grid">
-                <div class="function-box">
-                    <div class="function-header">
-                        <div class="function-icon">✅</div>
-                        <div>
-                            <div class="function-title">Account Verification</div>
-                            <div class="function-subtitle">Verify your identity for enhanced trust</div>
-                        </div>
-                    </div>
-                    
-                    <div id="verificationStatus" class="verification-status">
-                        <div style="font-size: 24px;">⏳</div>
-                        <div>
-                            <strong>Verification Status: Pending</strong>
-                            <p>Complete verification to unlock all features</p>
-                        </div>
-                    </div>
-                    
-                    <div style="margin: 20px 0;">
-                        <h4>Verification Steps:</h4>
-                        <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px; margin: 15px 0;">
-                            <div id="verificationSteps">
-                                <div class="verification-step">
-                                    <input type="checkbox" id="step1" disabled>
-                                    <label for="step1">📱 Phone number verification</label>
-                                </div>
-                                <div class="verification-step">
-                                    <input type="checkbox" id="step2" disabled>
-                                    <label for="step2">📧 Email confirmation</label>
-                                </div>
-                                <div class="verification-step">
-                                    <input type="checkbox" id="step3" disabled>
-                                    <label for="step3">🆔 Identity document (ID/Passport)</label>
-                                </div>
-                                <div class="verification-step">
-                                    <input type="checkbox" id="step4" disabled>
-                                    <label for="step4">🏦 Personal number (Personnummer)</label>
-                                </div>
-                                <div class="verification-step">
-                                    <input type="checkbox" id="step5" disabled>
-                                    <label for="step5">🏠 Address verification</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-success" onclick="startPhoneVerification()">📱 Verify Phone</button>
-                    <button class="btn btn-primary" onclick="uploadIDDocument()">🆔 Upload ID</button>
-                    <button class="btn btn-outline" onclick="checkVerificationStatus()">🔄 Check Status</button>
-                    
-                    <div id="verificationResult" class="result"></div>
-                </div>
-
-                <!-- BankID Integration -->
-                <div class="function-box">
-                    <div class="function-header">
-                        <div class="function-icon">🏦</div>
-                        <div>
-                            <div class="function-title">BankID Verification</div>
-                            <div class="function-subtitle">Instant verification with Swedish BankID</div>
-                        </div>
-                    </div>
-                    
-                    <div style="text-align: center; padding: 30px;">
-                        <div style="font-size: 64px; margin-bottom: 20px;">🏦</div>
-                        <h3>Quick BankID Verification</h3>
-                        <p>Verify your identity instantly using Swedish BankID</p>
-                        
-                        <button class="btn btn-primary" onclick="startBankIDVerification()" style="margin: 20px; font-size: 16px;">
-                            🏦 Start BankID Verification
-                        </button>
-                        
-                        <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 10px; margin: 20px 0;">
-                            <p style="color: #28a745; font-weight: bold;">✅ Benefits of BankID Verification:</p>
-                            <ul style="text-align: left; max-width: 400px; margin: 10px auto;">
-                                <li>Instant identity confirmation</li>
-                                <li>Access to premium features</li>
-                                <li>Higher trust score</li>
-                                <li>No deposit required for rentals</li>
-                                <li>Priority in applications</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div id="bankidResult" class="result"></div>
+                    <div id="propertyApplicationsResults"></div>
                 </div>
             </div>
         </div>
@@ -1150,83 +634,39 @@
                     <div class="function-header">
                         <div class="function-icon">📊</div>
                         <div>
-                            <div class="function-title">Property Analytics</div>
-                            <div class="function-subtitle">Performance insights for your listings</div>
+                            <div class="function-title">Dashboard Statistics</div>
+                            <div class="function-subtitle">Your platform performance</div>
                         </div>
                     </div>
                     
-                    <div class="trust-indicators">
-                        <div class="trust-item">
-                            <h4>👁️ Total Views</h4>
-                            <p id="totalViews">Loading...</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>📨 Applications</h4>
-                            <p id="totalApplications">Loading...</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>📞 Contact Rate</h4>
-                            <p id="contactRate">Loading...</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>⭐ Average Rating</h4>
-                            <p id="averageRating">Loading...</p>
-                        </div>
-                    </div>
+                    <button class="btn btn-primary" onclick="loadDashboardStats()">📊 Load Dashboard Stats</button>
                     
-                    <button class="btn btn-primary" onclick="loadAnalytics()">📊 Load Analytics</button>
-                    <button class="btn btn-outline" onclick="downloadAnalyticsReport()">📄 Download Report</button>
-                    
-                    <div id="analyticsChart" style="margin-top: 30px;">
-                        <!-- Chart placeholder -->
-                        <div style="background: rgba(255,255,255,0.9); padding: 40px; border-radius: 15px; text-align: center;">
-                            <h4>📈 Performance Chart</h4>
-                            <p>Click "Load Analytics" to view detailed performance charts</p>
-                        </div>
-                    </div>
+                    <div id="dashboardStats"></div>
                 </div>
 
-                <!-- Market Insights -->
                 <div class="function-box">
                     <div class="function-header">
-                        <div class="function-icon">🏘️</div>
+                        <div class="function-icon">📝</div>
                         <div>
-                            <div class="function-title">Market Insights</div>
-                            <div class="function-subtitle">Local rental market data</div>
+                            <div class="function-title">Activity Logs</div>
+                            <div class="function-subtitle">Track your platform activity</div>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Select Area:</label>
-                        <select id="marketArea">
-                            <option value="stockholm">Stockholm</option>
-                            <option value="goteborg">Göteborg</option>
-                            <option value="malmo">Malmö</option>
-                            <option value="uppsala">Uppsala</option>
-                        </select>
-                    </div>
+                    <button class="btn btn-primary" onclick="loadActivityLogs()">📝 Load Activity Logs</button>
                     
-                    <button class="btn btn-primary" onclick="loadMarketInsights()">📊 View Market Data</button>
-                    
-                    <div id="marketInsights" style="margin-top: 20px;"></div>
+                    <div id="activityLogsResults"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Image Modal -->
-    <div id="imageModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
-    </div>
-
     <script>
         let currentToken = '';
         let currentUser = null;
-        let selectedPropertyId = null;
-        let currentPage = 1;
-        let uploadedPhotos = [];
-        const API_BASE = 'https://hyra-tryggt-backend-n55n-git-main-attila122s-projects.vercel.app/';
+        
+        // FIXED: Correct API URL for your local backend
+        const API_BASE = 'https://hyra-tryggt-backend-production-03c1.up.railway.app';
 
         // Tab Management
         function showTab(tabName) {
@@ -1270,9 +710,6 @@
                 document.getElementById('authButtons').classList.add('hidden');
                 document.getElementById('userName').textContent = `👤 ${currentUser.name}`;
                 document.getElementById('authForms').classList.add('hidden');
-                
-                // Update verification status if available
-                updateVerificationUI();
             } else {
                 document.getElementById('userInfo').classList.add('hidden');
                 document.getElementById('authButtons').classList.remove('hidden');
@@ -1283,253 +720,11 @@
         function logout() {
             currentToken = '';
             currentUser = null;
-            uploadedPhotos = [];
             updateAuthUI();
             alert('👋 Successfully logged out!');
         }
 
-        // Photo Upload Handling
-        function setupPhotoUpload() {
-            const photoInput = document.getElementById('photoInput');
-            const photoUpload = document.getElementById('photoUpload');
-            const photoPreview = document.getElementById('photoPreview');
-
-            photoInput.addEventListener('change', handlePhotoSelection);
-            
-            // Drag and drop functionality
-            photoUpload.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                photoUpload.classList.add('dragover');
-            });
-            
-            photoUpload.addEventListener('dragleave', () => {
-                photoUpload.classList.remove('dragover');
-            });
-            
-            photoUpload.addEventListener('drop', (e) => {
-                e.preventDefault();
-                photoUpload.classList.remove('dragover');
-                const files = Array.from(e.dataTransfer.files);
-                handlePhotoFiles(files);
-            });
-        }
-
-        function handlePhotoSelection(event) {
-            const files = Array.from(event.target.files);
-            handlePhotoFiles(files);
-        }
-
-        function handlePhotoFiles(files) {
-            const maxFiles = 10;
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            
-            if (uploadedPhotos.length + files.length > maxFiles) {
-                alert(`Maximum ${maxFiles} photos allowed`);
-                return;
-            }
-            
-            files.forEach(file => {
-                if (!file.type.startsWith('image/')) {
-                    alert(`${file.name} is not an image file`);
-                    return;
-                }
-                
-                if (file.size > maxSize) {
-                    alert(`${file.name} is too large (max 5MB)`);
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    uploadedPhotos.push({
-                        file: file,
-                        dataUrl: e.target.result,
-                        name: file.name
-                    });
-                    updatePhotoPreview();
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function updatePhotoPreview() {
-            const photoPreview = document.getElementById('photoPreview');
-            photoPreview.innerHTML = '';
-            
-            uploadedPhotos.forEach((photo, index) => {
-                const photoContainer = document.createElement('div');
-                photoContainer.style.position = 'relative';
-                photoContainer.innerHTML = `
-                    <img src="${photo.dataUrl}" class="photo-thumbnail" onclick="openModal('${photo.dataUrl}')">
-                    <button type="button" onclick="removePhoto(${index})" 
-                            style="position: absolute; top: -8px; right: -8px; background: #dc3545; color: white; 
-                                   border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px;">×</button>
-                `;
-                photoPreview.appendChild(photoContainer);
-            });
-        }
-
-        function removePhoto(index) {
-            uploadedPhotos.splice(index, 1);
-            updatePhotoPreview();
-        }
-
-        // Enhanced Property Search
-        async function searchProperties(page = 1) {
-            currentPage = page;
-            
-            const params = new URLSearchParams();
-            
-            const city = document.getElementById('searchCity').value;
-            const maxRent = document.getElementById('searchMaxRent').value;
-            const minRooms = document.getElementById('searchMinRooms').value;
-            const propertyType = document.getElementById('searchPropertyType').value;
-            
-            // Safety filters
-            const verifiedOnly = document.getElementById('verifiedOnly').checked;
-            const rentGuaranteeOnly = document.getElementById('rentGuaranteeOnly').checked;
-            const noDepositOnly = document.getElementById('noDepositOnly').checked;
-            const insuranceIncluded = document.getElementById('insuranceIncluded').checked;
-            
-            if (city) params.append('city', city);
-            if (maxRent) params.append('maxRent', maxRent);
-            if (minRooms) params.append('minRooms', minRooms);
-            if (propertyType) params.append('type', propertyType);
-            if (verifiedOnly) params.append('verifiedOnly', 'true');
-            if (rentGuaranteeOnly) params.append('rentGuarantee', 'true');
-            if (noDepositOnly) params.append('noDeposit', 'true');
-            if (insuranceIncluded) params.append('insurance', 'true');
-            
-            params.append('page', page);
-            params.append('limit', 12);
-
-            try {
-                const response = await fetch(`${API_BASE}/properties/search?${params.toString()}`);
-                const result = await response.json();
-                
-                if (response.ok) {
-                    displayProperties(result.properties || result, 'propertyResults');
-                } else {
-                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
-                }
-            } catch (error) {
-                document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
-            }
-        }
-
-        // Enhanced Property Display
-        function displayProperties(properties, containerId) {
-            const container = document.getElementById(containerId);
-            
-            if (!properties || properties.length === 0) {
-                container.innerHTML = '<div class="result">No properties found matching your criteria.</div>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            
-            properties.forEach(property => {
-                const propertyCard = document.createElement('div');
-                propertyCard.className = 'property-card';
-                
-                const applicationCount = property._count?.applications || 0;
-                const isVerified = property.landlord?.verified || false;
-                const hasRentGuarantee = property.rentGuarantee || false;
-                const noDeposit = property.noDeposit || false;
-                const hasInsurance = property.insurance || false;
-                
-                // Safety badges
-                let safetyBadges = '';
-                if (isVerified) safetyBadges += '<span class="safety-badge">✅ Verified</span>';
-                if (hasRentGuarantee) safetyBadges += '<span class="safety-badge">🛡️ Rent Guarantee</span>';
-                if (noDeposit) safetyBadges += '<span class="safety-badge">💳 No Deposit</span>';
-                if (hasInsurance) safetyBadges += '<span class="safety-badge">🏠 Insured</span>';
-                
-                // Amenities display
-                const amenities = property.amenities || [];
-                let amenitiesHtml = '';
-                if (amenities.length > 0) {
-                    amenitiesHtml = `
-                        <div style="margin: 15px 0;">
-                            <strong>Amenities:</strong>
-                            <div style="margin-top: 8px;">
-                                ${amenities.map(amenity => `<span style="background: #f8f9fa; padding: 4px 8px; border-radius: 15px; margin: 2px; font-size: 12px; display: inline-block;">${getAmenityIcon(amenity)} ${amenity}</span>`).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                propertyCard.innerHTML = `
-                    <div class="property-header">
-                        <div>
-                            <h4 style="margin: 0; color: #333;">${property.title}</h4>
-                            <div style="margin: 8px 0;">${safetyBadges}</div>
-                        </div>
-                        <div class="property-price">${property.rent.toLocaleString()} SEK</div>
-                    </div>
-                    
-                    ${property.photos && property.photos.length > 0 ? `
-                        <div class="photo-gallery" style="margin: 15px 0;">
-                            ${property.photos.slice(0, 4).map(photo => `
-                                <img src="${photo}" class="photo-thumbnail" onclick="openModal('${photo}')" style="height: 120px;">
-                            `).join('')}
-                            ${property.photos.length > 4 ? `<div style="background: rgba(0,0,0,0.7); color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer;">+${property.photos.length - 4} more</div>` : ''}
-                        </div>
-                    ` : ''}
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0;">
-                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
-                            📍 ${property.address}, ${property.city}
-                        </div>
-                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
-                            🏠 ${property.rooms} rooms
-                        </div>
-                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
-                            📐 ${property.size} sqm
-                        </div>
-                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
-                            👤 ${property.landlord.name} ${isVerified ? '✅' : ''}
-                        </div>
-                    </div>
-                    
-                    ${amenitiesHtml}
-                    
-                    ${property.description ? `<p style="color: #666; margin: 15px 0;">${property.description}</p>` : ''}
-                    
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                        ${currentToken ? 
-                            `<button class="btn btn-success" onclick="applyForProperty(${property.id})">📨 Apply Now</button>
-                             <button class="btn btn-outline" onclick="contactLandlord('${property.landlord.email}', '${property.title}')">💬 Contact</button>
-                             <button class="btn btn-outline" onclick="saveProperty(${property.id})">⭐ Save</button>` : 
-                            `<button class="btn btn-warning" onclick="alert('Please login first to apply!')">🔓 Login to Apply</button>`
-                        }
-                        <small style="display: block; margin-top: 8px; color: #666;">
-                            Available from: ${property.availableFrom ? new Date(property.availableFrom).toLocaleDateString() : 'Immediately'}
-                            ${applicationCount > 0 ? ` • ${applicationCount} applications` : ''}
-                        </small>
-                    </div>
-                `;
-                
-                container.appendChild(propertyCard);
-            });
-        }
-
-        // Utility functions
-        function getAmenityIcon(amenity) {
-            const icons = {
-                'furnished': '🛋️',
-                'balcony': '🌿',
-                'parking': '🚗',
-                'elevator': '🛗',
-                'dishwasher': '🧽',
-                'laundry': '👕',
-                'pets': '🐕',
-                'wifi': '📶'
-            };
-            return icons[amenity] || '✨';
-        }
-
-        // Enhanced form submissions
+        // FIXED: Register form submission - CORRECT ENDPOINT
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1537,12 +732,12 @@
                 email: document.getElementById('regEmail').value,
                 password: document.getElementById('regPassword').value,
                 name: document.getElementById('regName').value,
-                phone: document.getElementById('regPhone').value,
-                personalNumber: document.getElementById('regPersonalNumber').value || null
+                phone: document.getElementById('regPhone').value || null
             };
 
             try {
-                const response = await fetch(`${API_BASE}/auth/register`, {
+                // FIXED: Removed /auth/ prefix
+                const response = await fetch(`${API_BASE}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -1552,7 +747,7 @@
                 showResult('authResult', result, response.ok);
                 
                 if (response.ok) {
-                    alert('✅ Registration successful! Please verify your email and phone.');
+                    alert('✅ Registration successful! Please login.');
                     showLoginForm();
                     document.getElementById('registerForm').reset();
                 }
@@ -1561,6 +756,7 @@
             }
         });
 
+        // FIXED: Login form submission - CORRECT ENDPOINT
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1570,22 +766,24 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE}/auth/login`, {
+                // FIXED: Removed /auth/ prefix
+                const response = await fetch(`${API_BASE}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
                 const result = await response.json();
-                showResult('authResult', result, response.ok);
                 
                 if (response.ok && result.token) {
                     currentToken = result.token;
                     currentUser = result.user;
                     updateAuthUI();
+                    showResult('authResult', { message: 'Login successful!' }, true);
                     alert(`✅ Welcome back, ${result.user.name}!`);
                     document.getElementById('loginForm').reset();
                 } else {
+                    showResult('authResult', result, false);
                     alert(`❌ Login failed: ${result.error || 'Unknown error'}`);
                 }
             } catch (error) {
@@ -1594,38 +792,24 @@
             }
         });
 
-        // Enhanced property form
+        // FIXED: Property form submission
         document.getElementById('propertyForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             if (!currentToken) {
-                showResult('propertyResult', { error: 'Please login first' }, false);
                 alert('❌ Please login first to list properties');
                 return;
             }
-            
-            // Collect amenities
-            const amenities = Array.from(document.querySelectorAll('input[name="amenities"]:checked'))
-                .map(checkbox => checkbox.value);
             
             const data = {
                 title: document.getElementById('propTitle').value,
                 description: document.getElementById('propDescription').value,
                 address: document.getElementById('propAddress').value,
                 city: document.getElementById('propCity').value,
-                postalCode: document.getElementById('propPostalCode').value,
                 rent: parseInt(document.getElementById('propRent').value),
                 rooms: parseInt(document.getElementById('propRooms').value),
                 size: parseInt(document.getElementById('propSize').value),
-                type: document.getElementById('propType').value,
-                amenities: amenities,
-                availableFrom: document.getElementById('propAvailableFrom').value,
-                leaseDuration: document.getElementById('propLeaseDuration').value,
-                rentGuarantee: document.getElementById('rentGuarantee').checked,
-                noDeposit: document.getElementById('noDeposit').checked,
-                insurance: document.getElementById('includeInsurance').checked,
-                tenantScreening: document.getElementById('tenantScreening').checked,
-                photos: uploadedPhotos.map(photo => photo.dataUrl) // In real app, upload to cloud storage
+                availableFrom: document.getElementById('propAvailableFrom').value
             };
 
             try {
@@ -1643,264 +827,492 @@
                 
                 if (response.ok) {
                     document.getElementById('propertyForm').reset();
-                    uploadedPhotos = [];
-                    updatePhotoPreview();
-                    alert('🏠 Property listed successfully with enhanced safety features!');
+                    alert('🏠 Property listed successfully!');
                 }
             } catch (error) {
                 showResult('propertyResult', { error: error.message }, false);
             }
         });
 
-        // Safety and verification functions
-        function showRentGuaranteeInfo() {
-            alert(`🛡️ Rent Guarantee Protection
-
-Our rent guarantee covers:
-• Up to 12 months of rent payments
-• Protection against tenant default
-• Legal costs for eviction proceedings
-• Property damage coverage up to 100,000 SEK
-
-Cost: 3% of annual rent value
-Activation: Automatic with qualified tenants
-
-Contact support for more details.`);
-        }
-
-        function showInsuranceInfo() {
-            alert(`🏠 Property Insurance Coverage
-
-Comprehensive protection includes:
-• Property damage up to 1,000,000 SEK
-• Liability coverage for accidents
-• Theft and vandalism protection
-• Loss of rent during repairs
-• Legal expense coverage
-
-Monthly premium: From 299 SEK
-Instant activation available
-
-Contact our insurance partner for quotes.`);
-        }
-
-        function startVerification() {
-            if (!currentToken) {
-                alert('Please login first to start verification');
-                return;
-            }
+        // FIXED: Search properties function - REMOVED /search
+        async function searchProperties() {
+            const params = new URLSearchParams();
             
-            showTab('verification');
-            alert(`✅ Starting verification process...
-
-Required documents:
-1. Valid ID or Passport
-2. Proof of address (utility bill)
-3. Phone number verification
-4. Email confirmation
-
-This process typically takes 24-48 hours.`);
-        }
-
-        function startPhoneVerification() {
-            if (!currentToken) {
-                alert('Please login first');
-                return;
-            }
+            const city = document.getElementById('searchCity').value;
+            const maxRent = document.getElementById('searchMaxRent').value;
+            const minRooms = document.getElementById('searchMinRooms').value;
+            const maxRooms = document.getElementById('searchMaxRooms').value;
             
-            const phone = prompt('Enter your phone number for SMS verification:');
-            if (phone) {
-                // Simulate sending SMS
-                alert(`📱 SMS verification code sent to ${phone}
+            if (city) params.append('city', city);
+            if (maxRent) params.append('maxRent', maxRent);
+            if (minRooms) params.append('minRooms', minRooms);
+            if (maxRooms) params.append('maxRooms', maxRooms);
+            
+            params.append('page', 1);
+            params.append('limit', 20);
 
-Enter the 6-digit code you receive to complete phone verification.`);
+            try {
+                // FIXED: Removed /search from endpoint
+                const response = await fetch(`${API_BASE}/properties?${params.toString()}`);
+                const result = await response.json();
                 
-                const code = prompt('Enter the 6-digit verification code:');
-                if (code && code.length === 6) {
-                    alert('✅ Phone verification successful!');
-                    document.getElementById('step1').checked = true;
-                    updateVerificationStatus();
+                if (response.ok) {
+                    displayProperties(result.properties || result, 'propertyResults');
+                } else {
+                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
                 }
+            } catch (error) {
+                document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
             }
         }
 
-        function uploadIDDocument() {
-            if (!currentToken) {
-                alert('Please login first');
+        // FIXED: Get all properties
+        async function getAllProperties() {
+            try {
+                const response = await fetch(`${API_BASE}/properties`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayProperties(result.properties || result, 'propertyResults');
+                } else {
+                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // FIXED: Display properties function
+        function displayProperties(properties, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!properties || properties.length === 0) {
+                container.innerHTML = '<div class="result">No properties found matching your criteria.</div>';
                 return;
             }
             
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*,.pdf';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    alert(`📄 ID document "${file.name}" uploaded successfully!
-
-Document verification typically takes 24-48 hours.
-You'll receive an email notification once verified.`);
-                    document.getElementById('step3').checked = true;
-                    updateVerificationStatus();
-                }
-            };
-            input.click();
-        }
-
-        function startBankIDVerification() {
-            if (!currentToken) {
-                alert('Please login first');
-                return;
-            }
+            container.innerHTML = '';
             
-            alert(`🏦 BankID Verification Starting...
-
-Please follow these steps:
-1. Open your BankID app
-2. Enter your personal code
-3. Confirm the verification request
-
-This will instantly verify your identity and unlock all premium features.`);
-            
-            // Simulate BankID process
-            setTimeout(() => {
-                const success = confirm('BankID verification completed. Accept verification?');
-                if (success) {
-                    alert('✅ BankID verification successful!');
-                    // Mark all verification steps as complete
-                    document.querySelectorAll('#verificationSteps input[type="checkbox"]').forEach(cb => {
-                        cb.checked = true;
-                    });
-                    updateVerificationStatus();
-                }
-            }, 3000);
-        }
-
-        function updateVerificationStatus() {
-            const steps = document.querySelectorAll('#verificationSteps input[type="checkbox"]');
-            const completed = Array.from(steps).filter(step => step.checked).length;
-            const total = steps.length;
-            
-            const statusDiv = document.getElementById('verificationStatus');
-            
-            if (completed === total) {
-                statusDiv.className = 'verification-status verified';
-                statusDiv.innerHTML = `
-                    <div style="font-size: 24px;">✅</div>
-                    <div>
-                        <strong>Verification Status: Verified</strong>
-                        <p>Your account is fully verified and trusted</p>
+            properties.forEach(property => {
+                const propertyCard = document.createElement('div');
+                propertyCard.className = 'property-card';
+                
+                const applicationCount = property._count?.applications || 0;
+                const isVerified = property.landlord?.verified || false;
+                
+                propertyCard.innerHTML = `
+                    <div class="property-header">
+                        <div>
+                            <h4 style="margin: 0; color: #333;">${property.title}</h4>
+                            ${isVerified ? '<span class="safety-badge">✅ Verified Landlord</span>' : ''}
+                        </div>
+                        <div class="property-price">${property.rent.toLocaleString()} SEK</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0;">
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            📍 ${property.address}, ${property.city}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            🏠 ${property.rooms} rooms
+                        </div>
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            📐 ${property.size} sqm
+                        </div>
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 8px; font-size: 14px;">
+                            👤 ${property.landlord.name}
+                        </div>
+                    </div>
+                    
+                    ${property.description ? `<p style="color: #666; margin: 15px 0;">${property.description}</p>` : ''}
+                    
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        ${currentToken ? 
+                            `<button class="btn btn-success" onclick="applyForProperty(${property.id})">📨 Apply Now</button>
+                             <button class="btn btn-outline" onclick="contactLandlord('${property.landlord.email}', '${property.title}')">💬 Contact</button>` : 
+                            `<button class="btn btn-warning" onclick="alert('Please login first to apply!')">🔓 Login to Apply</button>`
+                        }
+                        <small style="display: block; margin-top: 8px; color: #666;">
+                            Available from: ${property.availableFrom ? new Date(property.availableFrom).toLocaleDateString() : 'Immediately'}
+                            ${applicationCount > 0 ? ` • ${applicationCount} applications` : ''}
+                        </small>
                     </div>
                 `;
-            } else {
-                statusDiv.className = 'verification-status pending';
-                statusDiv.innerHTML = `
-                    <div style="font-size: 24px;">⏳</div>
-                    <div>
-                        <strong>Verification Status: ${completed}/${total} Complete</strong>
-                        <p>Complete remaining steps to unlock all features</p>
-                    </div>
-                `;
-            }
+                
+                container.appendChild(propertyCard);
+            });
         }
 
-        function updateVerificationUI() {
-            if (currentUser?.verified) {
-                updateVerificationStatus();
-            }
-        }
-
-        // Application functions with enhanced features
+        // FIXED: Apply for property function
         async function applyForProperty(propertyId) {
             if (!currentToken) {
                 alert('Please login first');
                 return;
             }
 
-            const applicationForm = `
-                <div style="max-width: 500px;">
-                    <h3>Apply for Property</h3>
-                    <div style="margin: 15px 0;">
-                        <label>Personal Message:</label>
-                        <textarea id="applicationMessage" rows="3" placeholder="Tell the landlord about yourself..." style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;"></textarea>
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <label>Monthly Income (SEK):</label>
-                        <input type="number" id="monthlyIncome" placeholder="35000" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <label>Move-in Date:</label>
-                        <input type="date" id="moveInDate" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <label><input type="checkbox" id="agreedToTerms"> I agree to the rental terms and safety policies</label>
-                    </div>
-                </div>
-            `;
+            const message = prompt('Add a personal message to your application (optional):');
+            
+            try {
+                const response = await fetch(`${API_BASE}/properties/${propertyId}/apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify({ message: message || null })
+                });
 
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                background-color: rgba(0,0,0,0.8); z-index: 2000; 
-                display: flex; align-items: center; justify-content: center;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%;">
-                    ${applicationForm}
-                    <div style="margin-top: 20px;">
-                        <button onclick="submitApplication(${propertyId})" class="btn btn-success">📨 Submit Application</button>
-                        <button onclick="closeModal()" class="btn btn-outline">Cancel</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            modal.onclick = (e) => {
-                if (e.target === modal) modal.remove();
-            };
-            
-            window.closeModal = () => modal.remove();
-            window.submitApplication = async (propId) => {
-                const message = document.getElementById('applicationMessage').value;
-                const income = document.getElementById('monthlyIncome').value;
-                const moveInDate = document.getElementById('moveInDate').value;
-                const agreed = document.getElementById('agreedToTerms').checked;
+                const result = await response.json();
                 
-                if (!agreed) {
-                    alert('Please agree to the terms and conditions');
-                    return;
+                if (response.ok) {
+                    alert('✅ Application submitted successfully! The landlord will be notified.');
+                } else {
+                    alert(`❌ Error: ${result.error}`);
                 }
-                
-                try {
-                    const response = await fetch(`${API_BASE}/properties/${propId}/apply`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${currentToken}`
-                        },
-                        body: JSON.stringify({ 
-                            message, 
-                            monthlyIncome: parseInt(income) || null,
-                            preferredMoveInDate: moveInDate || null
-                        })
-                    });
-
-                    const result = await response.json();
-                    
-                    if (response.ok) {
-                        alert('✅ Application submitted successfully! The landlord will be notified and can review your application.');
-                        modal.remove();
-                    } else {
-                        alert(`❌ Error: ${result.error}`);
-                    }
-                } catch (error) {
-                    alert(`❌ Error: ${error.message}`);
-                }
-            };
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
         }
 
-        // Contact and save functions
+        // FIXED: Load my properties
+        async function loadMyProperties() {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/my-properties`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayProperties(result, 'myPropertiesResults');
+                } else {
+                    document.getElementById('myPropertiesResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('myPropertiesResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // FIXED: Load my applications
+        async function loadMyApplications() {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/my-applications`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayApplications(result, 'myApplicationsResults');
+                } else {
+                    document.getElementById('myApplicationsResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('myApplicationsResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // FIXED: Load property applications
+        async function loadPropertyApplications() {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/my-property-applications`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayPropertyApplications(result, 'propertyApplicationsResults');
+                } else {
+                    document.getElementById('propertyApplicationsResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('propertyApplicationsResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // FIXED: Load dashboard stats
+        async function loadDashboardStats() {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/dashboard-stats`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayDashboardStats(result);
+                } else {
+                    document.getElementById('dashboardStats').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('dashboardStats').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // FIXED: Load activity logs
+        async function loadActivityLogs() {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/activity-logs`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayActivityLogs(result);
+                } else {
+                    document.getElementById('activityLogsResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('activityLogsResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Display functions
+        function displayApplications(applications, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!applications || applications.length === 0) {
+                container.innerHTML = '<div class="result">No applications found.</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            applications.forEach(application => {
+                const applicationCard = document.createElement('div');
+                applicationCard.className = 'property-card';
+                
+                const statusColor = {
+                    'PENDING': '#ffc107',
+                    'ACCEPTED': '#28a745',
+                    'REJECTED': '#dc3545',
+                    'WITHDRAWN': '#6c757d'
+                };
+                
+                applicationCard.innerHTML = `
+                    <div class="property-header">
+                        <div>
+                            <h4 style="margin: 0;">${application.property.title}</h4>
+                            <p style="color: #666; margin: 5px 0;">${application.property.address}, ${application.property.city}</p>
+                        </div>
+                        <div style="background: ${statusColor[application.status]}; color: white; padding: 5px 12px; border-radius: 20px; font-size: 14px;">
+                            ${application.status}
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 15px 0;">
+                        <strong>Applied:</strong> ${new Date(application.createdAt).toLocaleDateString()}<br>
+                        <strong>Rent:</strong> ${application.property.rent.toLocaleString()} SEK/month<br>
+                        ${application.message ? `<strong>Message:</strong> ${application.message}<br>` : ''}
+                    </div>
+                    
+                    ${application.status === 'PENDING' ? 
+                        `<button class="btn btn-outline" onclick="withdrawApplication(${application.id})">❌ Withdraw Application</button>` : ''
+                    }
+                `;
+                
+                container.appendChild(applicationCard);
+            });
+        }
+
+        function displayPropertyApplications(applications, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!applications || applications.length === 0) {
+                container.innerHTML = '<div class="result">No applications received yet.</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            applications.forEach(application => {
+                const applicationCard = document.createElement('div');
+                applicationCard.className = 'property-card';
+                
+                applicationCard.innerHTML = `
+                    <div class="property-header">
+                        <div>
+                            <h4 style="margin: 0;">${application.property.title}</h4>
+                            <p style="color: #666; margin: 5px 0;">Applicant: ${application.user.name}</p>
+                        </div>
+                        <div style="background: #667eea; color: white; padding: 5px 12px; border-radius: 20px; font-size: 14px;">
+                            ${application.status}
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 15px 0;">
+                        <strong>Applied:</strong> ${new Date(application.createdAt).toLocaleDateString()}<br>
+                        <strong>Email:</strong> ${application.user.email}<br>
+                        ${application.user.phone ? `<strong>Phone:</strong> ${application.user.phone}<br>` : ''}
+                        ${application.message ? `<strong>Message:</strong> ${application.message}<br>` : ''}
+                    </div>
+                    
+                    ${application.status === 'PENDING' ? `
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-success" onclick="updateApplicationStatus(${application.id}, 'ACCEPTED')">✅ Accept</button>
+                            <button class="btn btn-danger" onclick="updateApplicationStatus(${application.id}, 'REJECTED')">❌ Reject</button>
+                        </div>
+                    ` : ''}
+                `;
+                
+                container.appendChild(applicationCard);
+            });
+        }
+
+        function displayDashboardStats(stats) {
+            const container = document.getElementById('dashboardStats');
+            
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h3 style="margin: 0; color: #28a745;">${stats.properties?.total || 0}</h3>
+                        <p style="margin: 5px 0;">Total Properties</p>
+                    </div>
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h3 style="margin: 0; color: #667eea;">${stats.properties?.active || 0}</h3>
+                        <p style="margin: 5px 0;">Active Properties</p>
+                    </div>
+                    <div style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h3 style="margin: 0; color: #ffc107;">${stats.applications?.total || 0}</h3>
+                        <p style="margin: 5px 0;">Total Applications</p>
+                    </div>
+                    <div style="background: rgba(220, 53, 69, 0.1); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h3 style="margin: 0; color: #dc3545;">${stats.applications?.pending || 0}</h3>
+                        <p style="margin: 5px 0;">Pending Applications</p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                    <h4>📝 Recent Activity</h4>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        ${stats.recentActivity?.map(activity => `
+                            <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <strong>${activity.action}</strong> - ${activity.description}<br>
+                                <small style="color: #666;">${new Date(activity.createdAt).toLocaleString()}</small>
+                            </div>
+                        `).join('') || '<p>No recent activity</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayActivityLogs(data) {
+            const container = document.getElementById('activityLogsResults');
+            const logs = data.logs || data;
+            
+            if (!logs || logs.length === 0) {
+                container.innerHTML = '<div class="result">No activity logs found.</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                    <h4>📝 Your Activity History</h4>
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        ${logs.map(log => `
+                            <div style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div>
+                                        <strong style="color: #667eea;">${log.action}</strong>
+                                        ${log.description ? `<p style="margin: 5px 0; color: #666;">${log.description}</p>` : ''}
+                                        ${log.property ? `<small style="color: #28a745;">Property: ${log.property.title}</small>` : ''}
+                                    </div>
+                                    <small style="color: #999;">${new Date(log.createdAt).toLocaleString()}</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Application management functions
+        async function updateApplicationStatus(applicationId, status) {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/applications/${applicationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`✅ Application ${status.toLowerCase()} successfully!`);
+                    loadPropertyApplications(); // Reload applications
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function withdrawApplication(applicationId) {
+            if (!currentToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to withdraw this application?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/applications/${applicationId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ Application withdrawn successfully!');
+                    loadMyApplications(); // Reload applications
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Utility functions
         function contactLandlord(email, propertyTitle) {
             const subject = encodeURIComponent(`Inquiry about: ${propertyTitle}`);
             const body = encodeURIComponent(`Hi,
@@ -1918,122 +1330,12 @@ ${currentUser?.name || 'Potential Tenant'}`);
             window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
         }
 
-        async function saveProperty(propertyId) {
-            if (!currentToken) {
-                alert('Please login first');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/properties/${propertyId}/save`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${currentToken}` }
-                });
-                
-                if (response.ok) {
-                    alert('⭐ Property saved to your favorites!');
-                } else {
-                    alert('❌ Error saving property');
-                }
-            } catch (error) {
-                alert(`❌ Error: ${error.message}`);
-            }
-        }
-
-        // Analytics functions
-        async function loadAnalytics() {
-            if (!currentToken) {
-                alert('Please login first');
-                return;
-            }
-            
-            // Simulate analytics data
-            document.getElementById('totalViews').textContent = '1,247';
-            document.getElementById('totalApplications').textContent = '23';
-            document.getElementById('contactRate').textContent = '18.5%';
-            document.getElementById('averageRating').textContent = '4.7/5';
-            
-            // Create simple analytics chart
-            const chartDiv = document.getElementById('analyticsChart');
-            chartDiv.innerHTML = `
-                <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px;">
-                    <h4>📈 Property Performance (Last 30 Days)</h4>
-                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 20px 0;">
-                        ${Array.from({length: 7}, (_, i) => `
-                            <div style="text-align: center;">
-                                <div style="height: ${Math.random() * 100 + 20}px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 4px; margin-bottom: 5px;"></div>
-                                <small>Day ${i + 1}</small>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <p style="text-align: center; color: #666;">Daily views and application trends</p>
-                </div>
-            `;
-        }
-
-        // Market insights
-        async function loadMarketInsights() {
-            const area = document.getElementById('marketArea').value;
-            const insights = {
-                stockholm: { avgRent: '18,500', growth: '+5.2%', demand: 'High' },
-                goteborg: { avgRent: '14,200', growth: '+3.8%', demand: 'Medium' },
-                malmo: { avgRent: '12,800', growth: '+4.1%', demand: 'Medium' },
-                uppsala: { avgRent: '13,500', growth: '+6.3%', demand: 'High' }
-            };
-            
-            const data = insights[area];
-            document.getElementById('marketInsights').innerHTML = `
-                <div style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px; margin-top: 15px;">
-                    <h4>📊 Market Data for ${area.charAt(0).toUpperCase() + area.slice(1)}</h4>
-                    <div class="trust-indicators" style="margin-top: 15px;">
-                        <div class="trust-item">
-                            <h4>💰 Average Rent</h4>
-                            <p>${data.avgRent} SEK</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>📈 YoY Growth</h4>
-                            <p>${data.growth}</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>🔥 Demand Level</h4>
-                            <p>${data.demand}</p>
-                        </div>
-                        <div class="trust-item">
-                            <h4>⏱️ Avg. Days Listed</h4>
-                            <p>14 days</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Utility functions
-        function getAllProperties() {
-            document.getElementById('searchCity').value = '';
-            document.getElementById('searchMaxRent').value = '';
-            document.getElementById('searchMinRooms').value = '';
-            document.getElementById('searchPropertyType').value = '';
-            searchProperties(1);
-        }
-
         function clearSearch() {
             document.getElementById('searchCity').value = '';
             document.getElementById('searchMaxRent').value = '';
             document.getElementById('searchMinRooms').value = '';
-            document.getElementById('searchPropertyType').value = '';
-            document.querySelectorAll('#searchTab input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('searchMaxRooms').value = '';
             document.getElementById('propertyResults').innerHTML = '';
-        }
-
-        function openModal(imageSrc) {
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
-            modal.style.display = 'block';
-            modalImg.src = imageSrc;
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
         }
 
         function showResult(elementId, data, success) {
@@ -2045,20 +1347,14 @@ ${currentUser?.name || 'Potential Tenant'}`);
         // Initialize on page load
         window.addEventListener('load', function() {
             updateAuthUI();
-            setupPhotoUpload();
             
             // Set default date for property availability
             const today = new Date();
             today.setDate(today.getDate() + 7); // Default to 1 week from now
             document.getElementById('propAvailableFrom').valueAsDate = today;
             
-            // Close modal when clicking outside
-            window.onclick = function(event) {
-                const modal = document.getElementById('imageModal');
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            }
+            // Auto-load all properties on startup
+            getAllProperties();
         });
     </script>
 </body>
