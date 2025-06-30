@@ -1,3 +1,4 @@
+const cloudinary = require('cloudinary').v2;
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -39,6 +40,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
+
 // Initialize Prisma with error handling
 let prisma;
 try {
@@ -56,8 +58,62 @@ const isProduction = process.env.NODE_ENV === 'production';
 console.log(`Environment: ${isProduction ? 'production' : 'development'}`);
 
 // Configure email transporter
+// Replace the email configuration section in your index.js with this:
+
+// Configure email transporter
 let emailTransporter = null;
-console.log('Email disabled for testing - will add back later');
+
+try {
+  if (process.env.EMAIL_SERVICE === 'gmail') {
+    // Gmail configuration
+    emailTransporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+    console.log('📧 Gmail email service configured');
+  } else if (process.env.EMAIL_SERVICE === 'sendgrid') {
+    // SendGrid configuration
+    emailTransporter = nodemailer.createTransporter({
+      host: 'smtp.sendgrid.net',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'apikey',
+        pass: process.env.SENDGRID_API_KEY
+      }
+    });
+    console.log('📧 SendGrid email service configured');
+  } else {
+    console.log('📧 Email service not configured - set EMAIL_SERVICE in .env');
+  }
+} catch (error) {
+  console.error('❌ Email configuration error:', error.message);
+}
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+// Helper function to log activities
+async function logActivity(userId, action, description, metadata = null, propertyId = null) {
+  try {
+    await prisma.activityLog.create({
+      data: {
+        userId: userId,
+        propertyId: propertyId,
+        action: action,
+        description: description,
+        metadata: metadata,
+        createdAt: new Date()
+      }
+    });
+  } catch (error) {
+    console.error('Activity logging error:', error);
+  }
+}
 
 // Send email notification
 async function sendEmail(to, subject, html) {
@@ -114,8 +170,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
 
-// Input validation helpers
+// ADD THIS LINE RIGHT HERE:
+app.use(express.static('public')); // or whatever folder contains your HTML files
+
+// Input validation helpers...
 const validateEmail = (email) => {
+  // ... rest of your code continues
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
@@ -148,34 +208,42 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Root endpoint
+
+// Replace your current root endpoint with this:
 app.get('/', (req, res) => {
-  console.log('Root endpoint called');
-  res.json({ 
-    message: 'Hyra Tryggt API is running!',
-    version: '3.0.0',
-    environment: isProduction ? 'production' : 'development',
-    timestamp: new Date().toISOString(),
-    features: {
-      authentication: true,
-      properties: true,
-      images: true,
-      applications: true,
-      email: !!emailTransporter,
-      prisma: !!prisma
-    },
-    endpoints: {
-      auth: ['/register', '/login', '/profile'],
-      properties: ['/properties', '/properties/:id', '/my-properties'],
-      images: ['/properties/:id/images', '/images/:id'],
-      applications: ['/applications', '/applications/:id', '/properties/:id/apply', '/my-applications']
-    },
-    serverInfo: {
-      nodeVersion: process.version,
-      platform: process.platform,
-      uptime: process.uptime()
-    }
-  });
+  // Check if request accepts HTML (browser request)
+  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  } else {
+    // Return JSON for API requests
+    res.json({ 
+      message: 'Hyra Tryggt API is running!',
+      version: '3.1.0',
+      environment: isProduction ? 'production' : 'development',
+      timestamp: new Date().toISOString(),
+      features: {
+        authentication: true,
+        properties: true,
+        images: true,
+        applications: true,
+        activityLogging: true,
+        email: !!emailTransporter,
+        prisma: !!prisma
+      },
+      endpoints: {
+        auth: ['/register', '/login', '/profile'],
+        properties: ['/properties', '/properties/:id', '/my-properties'],
+        images: ['/properties/:id/images', '/images/:id'],
+        applications: ['/applications', '/applications/:id', '/properties/:id/apply', '/my-applications'],
+        analytics: ['/activity-logs', '/dashboard-stats']
+      },
+      serverInfo: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        uptime: process.uptime()
+      }
+    });
+  }
 });
 
 // Health check
@@ -231,6 +299,9 @@ app.post('/register', authLimiter, async (req, res) => {
         phone: phone ? phone.trim() : null
       }
     });
+
+    // Log registration activity
+    await logActivity(user.id, 'REGISTER', 'User registered successfully');
     
     res.status(201).json({ 
       message: 'User created successfully',
@@ -271,6 +342,20 @@ app.post('/login', authLimiter, async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
+    // Update last login time
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    });
+
+    // Log login activity
+    await logActivity(
+      user.id, 
+      'LOGIN', 
+      'User logged in successfully',
+      { userAgent: req.headers['user-agent'] }
+    );
+    
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET || 'fallback-secret-key-123',
@@ -305,6 +390,7 @@ app.get('/profile', authenticateToken, async (req, res) => {
         name: true,
         phone: true,
         createdAt: true,
+        lastLoginAt: true,
         _count: {
           select: { 
             properties: true,
@@ -355,6 +441,15 @@ app.post('/properties', authenticateToken, async (req, res) => {
         landlordId: req.user.userId
       }
     });
+
+    // Log property creation
+    await logActivity(
+      req.user.userId, 
+      'CREATE_PROPERTY', 
+      `Created property: ${property.title}`,
+      { propertyId: property.id, rent: property.rent, city: property.city },
+      property.id
+    );
     
     res.status(201).json({
       message: 'Property created successfully',
@@ -485,18 +580,26 @@ app.post('/properties/:id/images', authenticateToken, upload.array('images', 10)
       
       // In a real implementation, upload file to cloud storage here
       // For now, we'll just create database records
-      const imageRecord = await prisma.image.create({
+      const imageRecord = await prisma.propertyImage.create({
         data: {
-          id: imageId,
-          propertyId: propertyId,
           url: `/images/${imageId}`, // Placeholder URL
           alt: `Property image ${i + 1}`,
-          isPrimary: i === 0 // First image is primary
+          isPrimary: i === 0, // First image is primary
+          propertyId: propertyId
         }
       });
       
       imageRecords.push(imageRecord);
     }
+
+    // Log image upload
+    await logActivity(
+      req.user.userId, 
+      'UPLOAD_IMAGES', 
+      `Uploaded ${req.files.length} images for property`,
+      { imageCount: req.files.length },
+      propertyId
+    );
     
     res.status(201).json({
       message: 'Images uploaded successfully',
@@ -514,7 +617,7 @@ app.get('/properties/:id/images', async (req, res) => {
   try {
     const propertyId = parseInt(req.params.id);
     
-    const images = await prisma.image.findMany({
+    const images = await prisma.propertyImage.findMany({
       where: { propertyId: propertyId },
       orderBy: [
         { isPrimary: 'desc' },
@@ -532,9 +635,9 @@ app.get('/properties/:id/images', async (req, res) => {
 // Set primary image
 app.put('/images/:id/primary', authenticateToken, async (req, res) => {
   try {
-    const imageId = req.params.id;
+    const imageId = parseInt(req.params.id);
     
-    const image = await prisma.image.findUnique({
+    const image = await prisma.propertyImage.findUnique({
       where: { id: imageId },
       include: { property: true }
     });
@@ -548,13 +651,13 @@ app.put('/images/:id/primary', authenticateToken, async (req, res) => {
     }
     
     // Remove primary status from other images
-    await prisma.image.updateMany({
+    await prisma.propertyImage.updateMany({
       where: { propertyId: image.propertyId },
       data: { isPrimary: false }
     });
     
     // Set this image as primary
-    await prisma.image.update({
+    await prisma.propertyImage.update({
       where: { id: imageId },
       data: { isPrimary: true }
     });
@@ -569,9 +672,9 @@ app.put('/images/:id/primary', authenticateToken, async (req, res) => {
 // Delete image
 app.delete('/images/:id', authenticateToken, async (req, res) => {
   try {
-    const imageId = req.params.id;
+    const imageId = parseInt(req.params.id);
     
-    const image = await prisma.image.findUnique({
+    const image = await prisma.propertyImage.findUnique({
       where: { id: imageId },
       include: { property: true }
     });
@@ -584,7 +687,7 @@ app.delete('/images/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Not authorized' });
     }
     
-    await prisma.image.delete({
+    await prisma.propertyImage.delete({
       where: { id: imageId }
     });
     
@@ -651,6 +754,15 @@ app.post('/properties/:id/apply', authenticateToken, async (req, res) => {
         }
       }
     });
+
+    // Log application
+    await logActivity(
+      req.user.userId, 
+      'APPLY_PROPERTY', 
+      `Applied for property: ${property.title}`,
+      { applicationId: application.id, rent: property.rent },
+      propertyId
+    );
     
     // Send email notification to landlord
     if (emailTransporter) {
@@ -772,6 +884,15 @@ app.put('/applications/:id', authenticateToken, async (req, res) => {
         }
       }
     });
+
+    // Log application status change
+    await logActivity(
+      req.user.userId, 
+      'UPDATE_APPLICATION', 
+      `Updated application status to ${status}`,
+      { applicationId: applicationId, status: status, applicantName: application.user.name },
+      application.property.id
+    );
     
     // Send email notification to applicant
     if (emailTransporter) {
@@ -828,11 +949,192 @@ app.delete('/applications/:id', authenticateToken, async (req, res) => {
       where: { id: applicationId },
       data: { status: 'WITHDRAWN' }
     });
+
+    // Log application withdrawal
+    await logActivity(
+      req.user.userId, 
+      'WITHDRAW_APPLICATION', 
+      `Withdrew application for property: ${application.property.title}`,
+      { applicationId: applicationId },
+      application.property.id
+    );
     
     res.json({ message: 'Application withdrawn successfully' });
     
   } catch (error) {
     console.error('Withdraw application error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// NEW: Get activity logs
+app.get('/activity-logs', authenticateToken, async (req, res) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const [logs, total] = await Promise.all([
+      prisma.activityLog.findMany({
+        where: { userId: req.user.userId },
+        include: {
+          property: {
+            select: { id: true, title: true, address: true }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: parseInt(limit)
+      }),
+      prisma.activityLog.count({ where: { userId: req.user.userId } })
+    ]);
+    
+    res.json({
+      logs,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    console.error('Get activity logs error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// NEW: Dashboard statistics
+app.get('/dashboard-stats', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    
+    const [
+      totalProperties,
+      activeProperties,
+      totalApplications,
+      pendingApplications,
+      recentActivity
+    ] = await Promise.all([
+      prisma.property.count({ where: { landlordId: userId } }),
+      prisma.property.count({ where: { landlordId: userId, isAvailable: true } }),
+      prisma.application.count({ where: { userId: userId } }),
+      prisma.application.count({ where: { userId: userId, status: 'PENDING' } }),
+      prisma.activityLog.findMany({
+        where: { userId: userId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        include: {
+          property: {
+            select: { title: true }
+          }
+        }
+      })
+    ]);
+    
+    res.json({
+      properties: {
+        total: totalProperties,
+        active: activeProperties
+      },
+      applications: {
+        total: totalApplications,
+        pending: pendingApplications
+      },
+      recentActivity: recentActivity
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// NEW: Update property notes
+app.put('/properties/:id/notes', authenticateToken, async (req, res) => {
+  try {
+    const propertyId = parseInt(req.params.id);
+    const { notes } = req.body;
+    
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId, landlordId: req.user.userId }
+    });
+    
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found or not owned by you' });
+    }
+    
+    const updatedProperty = await prisma.property.update({
+      where: { id: propertyId },
+      data: { notes: notes || null }
+    });
+
+    // Log notes update
+    await logActivity(
+      req.user.userId, 
+      'UPDATE_NOTES', 
+      'Updated property notes',
+      { hasNotes: !!notes },
+      propertyId
+    );
+    
+    res.json({
+      message: 'Property notes updated successfully',
+      property: updatedProperty
+    });
+    
+  } catch (error) {
+    console.error('Update property notes error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// NEW: Add internal notes to applications
+app.put('/applications/:id/notes', authenticateToken, async (req, res) => {
+  try {
+    const applicationId = parseInt(req.params.id);
+    const { internalNotes } = req.body;
+    
+    const application = await prisma.application.findUnique({
+      where: { id: applicationId },
+      include: { property: true }
+    });
+    
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+    
+    if (application.property.landlordId !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to update this application' });
+    }
+    
+    const updatedApplication = await prisma.application.update({
+      where: { id: applicationId },
+      data: { internalNotes: internalNotes || null },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, phone: true }
+        },
+        property: {
+          select: { id: true, title: true, address: true, city: true, rent: true }
+        }
+      }
+    });
+
+    // Log notes update
+    await logActivity(
+      req.user.userId, 
+      'UPDATE_APPLICATION_NOTES', 
+      'Updated application internal notes',
+      { applicationId: applicationId, hasNotes: !!internalNotes },
+      application.property.id
+    );
+    
+    res.json({
+      message: 'Application notes updated successfully',
+      application: updatedApplication
+    });
+    
+  } catch (error) {
+    console.error('Update application notes error:', error);
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
@@ -858,7 +1160,11 @@ app.use('*', (req, res) => {
       'GET /properties/:id/images',
       'POST /properties/:id/apply',
       'GET /my-applications',
-      'GET /my-property-applications'
+      'GET /my-property-applications',
+      'GET /activity-logs',
+      'GET /dashboard-stats',
+      'PUT /properties/:id/notes',
+      'PUT /applications/:id/notes'
     ]
   });
 });
@@ -872,11 +1178,7 @@ app.use((err, req, res, next) => {
     timestamp: new Date().toISOString()
   });
 });
-// Ta bort detta villkor:
-// if (require.main === module) {
 
-
-// }  // Ta bort denna avslutande klammer också
 // Graceful shutdown handling
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
@@ -887,12 +1189,15 @@ process.on('SIGTERM', async () => {
 });
 
 console.log('Server initialized successfully');
-// Och lägg till detta istället (utan villkor):
+
+// Start server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📊 Prisma: ${prisma ? 'Connected' : 'Not connected'}`);
   console.log(`📧 Email: ${emailTransporter ? 'Enabled' : 'Disabled'}`);
+  console.log(`✨ Features: Activity Logging, Performance Indexes, Notes System`);
 });
+
 // Export as Vercel serverless function
 module.exports = app;
