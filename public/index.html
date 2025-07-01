@@ -207,13 +207,54 @@
             font-size: 14px;
             transition: all 0.3s ease;
             background: rgba(255,255,255,0.9);
+            outline: none !important;
+            box-shadow: none !important;
         }
         
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none;
+            outline: none !important;
             border-color: #667eea;
             background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+        }
+        
+        .form-group input:active, .form-group textarea:active, .form-group select:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Remove ALL possible blue outlines from ALL inputs */
+        input, textarea, select, button {
+            outline: none !important;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        input:focus, textarea:focus, select:focus, button:focus {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-focus-ring-color: transparent;
+            -webkit-user-select: none;
+        }
+        
+        input:active, textarea:active, select:active, button:active {
+            outline: none !important;
+        }
+        
+        /* Specifically target form inputs */
+        input[type="text"], input[type="email"], input[type="password"], 
+        input[type="number"], input[type="date"], textarea, select {
+            outline: none !important;
+            box-shadow: none !important;
+            border: 2px solid #e1e5e9 !important;
+        }
+        
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, 
+        input[type="number"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
+            outline: none !important;
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
         }
         
         .form-row {
@@ -365,6 +406,19 @@
             display: inline-block;
             text-align: center;
             background-clip: padding-box;
+            outline: none;
+            box-shadow: none;
+        }
+        
+        .btn:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        
+        .btn:active {
+            outline: none !important;
+            box-shadow: none !important;
         }
         
         .btn:hover {
@@ -889,10 +943,9 @@
         let currentToken = '';
         let currentUser = null;
         
-        // UPDATED: Correct Railway API endpoint first!
+        // UPDATED: Railway endpoint working correctly (NO trailing slash needed)
         const API_ENDPOINTS = [
             'https://hyra-tryggt-backend-production-03c1.up.railway.app',
-            'https://hyra-tryggt-backend-production-03c1.up.railway.app/api',
             
             // Fallback alternatives:
             'https://hyratryggt.se/api',
@@ -1266,10 +1319,9 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE}/properties`, {
+                const response = await makeAPICall(`${currentAPIBase}/properties`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${currentToken}`
                     },
                     body: JSON.stringify(data)
@@ -1417,10 +1469,9 @@
             const message = prompt('Add a personal message to your application (optional):');
             
             try {
-                const response = await fetch(`${API_BASE}/properties/${propertyId}/apply`, {
+                const response = await makeAPICall(`${currentAPIBase}/properties/${propertyId}/apply`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${currentToken}`
                     },
                     body: JSON.stringify({ message: message || null })
@@ -1446,7 +1497,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/my-properties`, {
+                const response = await makeAPICall(`${currentAPIBase}/my-properties`, {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -1470,7 +1521,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/my-applications`, {
+                const response = await makeAPICall(`${currentAPIBase}/my-applications`, {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -1494,7 +1545,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/my-property-applications`, {
+                const response = await makeAPICall(`${currentAPIBase}/my-property-applications`, {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -1518,7 +1569,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/dashboard-stats`, {
+                const response = await makeAPICall(`${currentAPIBase}/dashboard-stats`, {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -1542,7 +1593,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/activity-logs`, {
+                const response = await makeAPICall(`${currentAPIBase}/activity-logs`, {
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
                 
@@ -1727,10 +1778,9 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/applications/${applicationId}`, {
+                const response = await makeAPICall(`${currentAPIBase}/applications/${applicationId}`, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${currentToken}`
                     },
                     body: JSON.stringify({ status })
@@ -1760,7 +1810,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/applications/${applicationId}`, {
+                const response = await makeAPICall(`${currentAPIBase}/applications/${applicationId}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${currentToken}` }
                 });
