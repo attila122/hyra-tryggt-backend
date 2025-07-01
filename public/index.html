@@ -943,19 +943,16 @@
         let currentToken = '';
         let currentUser = null;
         
-        // UPDATED: Railway endpoint working correctly (NO trailing slash needed)
+        // UPDATED: Railway is hosting both frontend and backend at same URL
         const API_ENDPOINTS = [
             'https://hyra-tryggt-backend-production-03c1.up.railway.app',
             
-            // Fallback alternatives:
-            'https://hyratryggt.se/api',
+            // Fallback alternatives if needed:
+            'https://hyratryggt.se',
             'https://api.hyratryggt.se',
-            'http://localhost:3000/api',
-            'http://localhost:8000/api',
-            'http://localhost:5000',
-            'http://localhost:4000',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:8000'
+            'http://localhost:3000',
+            'http://localhost:8000',
+            'http://localhost:5000'
         ];
         
         let currentAPIBase = API_ENDPOINTS[0]; // Start with Railway endpoint
