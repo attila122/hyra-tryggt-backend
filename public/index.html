@@ -135,10 +135,10 @@
             display: block;
         }
         
-        /* Function Grid */
+        /* UPDATED: Single Column Layout */
         .functions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 30px;
             margin-bottom: 40px;
         }
@@ -151,6 +151,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             border: 1px solid rgba(255,255,255,0.2);
+            width: 100%;
         }
         
         .function-box:hover {
@@ -221,6 +222,135 @@
             gap: 15px;
         }
         
+        /* UPDATED: Fixed Dual Range Slider - Dots ON the track */
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .dual-slider-wrapper {
+            position: relative;
+            padding: 20px 0;
+            height: 40px;
+        }
+        
+        .slider-track {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 5px;
+        }
+        
+        .slider-range {
+            position: absolute;
+            height: 8px;
+            background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+            top: 0;
+        }
+        
+        .rent-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: transparent;
+            outline: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        .rent-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            pointer-events: all;
+            border: 3px solid white;
+        }
+        
+        .rent-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        
+        .rent-slider::-webkit-slider-thumb:active {
+            transform: scale(1.3);
+        }
+        
+        .rent-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            pointer-events: all;
+        }
+        
+        .rent-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        
+        .rent-slider::-moz-range-thumb:active {
+            transform: scale(1.3);
+        }
+        
+        .rent-slider.max-slider::-webkit-slider-thumb {
+            background: #764ba2;
+        }
+        
+        .rent-slider.max-slider::-moz-range-thumb {
+            background: #764ba2;
+        }
+        
+        .slider-values {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 20px;
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 16px;
+            flex: 1;
+        }
+        
+        .slider-value.max-value {
+            color: #764ba2;
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
         /* Button Styles */
         .btn {
             padding: 12px 24px;
@@ -234,6 +364,7 @@
             text-decoration: none;
             display: inline-block;
             text-align: center;
+            background-clip: padding-box;
         }
         
         .btn:hover {
@@ -270,6 +401,14 @@
         .btn-outline:hover {
             background: #667eea;
             color: white;
+        }
+        
+        /* UPDATED: Button Group with better spacing */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
         }
         
         /* Safety Badge */
@@ -350,12 +489,8 @@
             display: none;
         }
         
-        /* Responsive Design */
+        /* UPDATED: Better Mobile Responsive Design */
         @media (max-width: 768px) {
-            .functions-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .header-content {
                 flex-direction: column;
                 gap: 15px;
@@ -372,6 +507,47 @@
             
             .nav-content {
                 justify-content: flex-start;
+            }
+            
+            .logo {
+                font-size: 24px;
+            }
+            
+            .function-box {
+                padding: 20px;
+            }
+            
+            .function-title {
+                font-size: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .property-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .function-box {
+                padding: 15px;
+            }
+            
+            .nav-tab {
+                padding: 8px 15px;
+                font-size: 14px;
             }
         }
     </style>
@@ -399,6 +575,7 @@
         <div class="nav-content">
             <button class="nav-tab active" onclick="showTab('search')">🔍 Search Properties</button>
             <button class="nav-tab" onclick="showTab('list')">🏠 List Property</button>
+            <button class="nav-tab" onclick="showTab('myproperties')">🏘️ My Properties</button>
             <button class="nav-tab" onclick="showTab('applications')">📋 Applications</button>
             <button class="nav-tab" onclick="showTab('analytics')">📊 Analytics</button>
         </div>
@@ -427,8 +604,10 @@
                         <input type="password" id="loginPassword" placeholder="••••••••" required>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">🔓 Secure Login</button>
-                <button type="button" class="btn btn-outline" onclick="showRegisterForm()">Create Account</button>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">🔓 Secure Login</button>
+                    <button type="button" class="btn btn-outline" onclick="showRegisterForm()">Create Account</button>
+                </div>
             </form>
             
             <!-- Register Form -->
@@ -453,8 +632,10 @@
                         <input type="text" id="regPhone" placeholder="+46701234567">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-success">📝 Create Secure Account</button>
-                <button type="button" class="btn btn-outline" onclick="showLoginForm()">Already have account?</button>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-success">📝 Create Secure Account</button>
+                    <button type="button" class="btn btn-outline" onclick="showLoginForm()">Already have account?</button>
+                </div>
             </form>
             
             <div id="authResult" class="result"></div>
@@ -462,6 +643,14 @@
 
         <!-- Search Properties Tab -->
         <div id="searchTab" class="tab-content active">
+            <!-- Connectivity Status -->
+            <div id="connectivityStatus" class="function-box" style="margin-bottom: 20px;">
+                <div class="result">
+                    <strong>🔄 Checking API connectivity...</strong>
+                    <br><small>Testing connection to backend servers...</small>
+                </div>
+            </div>
+            
             <div class="functions-grid">
                 <div class="function-box">
                     <div class="function-header">
@@ -477,9 +666,25 @@
                             <label>City/Area:</label>
                             <input type="text" id="searchCity" placeholder="Stockholm, Göteborg, Malmö...">
                         </div>
-                        <div class="form-group">
-                            <label>Max Rent (SEK):</label>
-                            <input type="number" id="searchMaxRent" placeholder="25000">
+                    </div>
+                    
+                    <!-- UPDATED: Dual Range Slider for Min/Max Rent -->
+                    <div class="slider-container">
+                        <label>Rent Range (SEK):</label>
+                        <div class="dual-slider-wrapper">
+                            <div class="slider-track">
+                                <div class="slider-range" id="sliderRange"></div>
+                            </div>
+                            <input type="range" id="searchMinRent" class="rent-slider min-slider" min="0" max="50000" value="0" step="1000">
+                            <input type="range" id="searchMaxRent" class="rent-slider max-slider" min="0" max="50000" value="25000" step="1000">
+                            <div class="slider-values">
+                                <div class="slider-value" id="minRentValue">0 SEK</div>
+                                <div class="slider-value max-value" id="maxRentValue">25,000 SEK</div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>0 SEK</span>
+                                <span>50,000 SEK</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -506,29 +711,16 @@
                         </div>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div class="button-group">
                         <button class="btn btn-primary" onclick="searchProperties()">🔍 Search Properties</button>
                         <button class="btn btn-outline" onclick="getAllProperties()">📋 View All</button>
                         <button class="btn btn-outline" onclick="clearSearch()">🗑️ Clear Filters</button>
+                        <button class="btn btn-warning" onclick="testConnectivity()">🔧 Test Connection</button>
+                        <button class="btn btn-success" onclick="loadMockData()">📝 Load Demo Data</button>
+                        <button class="btn btn-outline" onclick="setCustomEndpoint()">⚙️ Set API URL</button>
                     </div>
                     
                     <div id="propertyResults" style="max-height: 600px; overflow-y: auto; margin-top: 20px;"></div>
-                </div>
-
-                <!-- My Properties -->
-                <div class="function-box">
-                    <div class="function-header">
-                        <div class="function-icon">🏠</div>
-                        <div>
-                            <div class="function-title">My Properties</div>
-                            <div class="function-subtitle">Manage your property listings</div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="loadMyProperties()">📋 View My Properties</button>
-                    <button class="btn btn-outline" onclick="showTab('list')">➕ Add New Property</button>
-                    
-                    <div id="myPropertiesResults"></div>
                 </div>
             </div>
         </div>
@@ -586,11 +778,35 @@
                         <textarea id="propDescription" rows="4" placeholder="Describe your property in detail..."></textarea>
                     </div>
                     
-                    <button type="submit" class="btn btn-success">🏠 List Property</button>
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('propertyForm').reset()">🗑️ Clear Form</button>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-success">🏠 List Property</button>
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('propertyForm').reset()">🗑️ Clear Form</button>
+                    </div>
                 </form>
                 
                 <div id="propertyResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- My Properties Tab -->
+        <div id="mypropertiesTab" class="tab-content">
+            <div class="functions-grid">
+                <div class="function-box">
+                    <div class="function-header">
+                        <div class="function-icon">🏘️</div>
+                        <div>
+                            <div class="function-title">My Properties</div>
+                            <div class="function-subtitle">Manage your property listings</div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="loadMyProperties()">📋 View My Properties</button>
+                        <button class="btn btn-outline" onclick="showTab('list')">➕ Add New Property</button>
+                    </div>
+                    
+                    <div id="myPropertiesResults"></div>
+                </div>
             </div>
         </div>
 
@@ -606,7 +822,9 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary" onclick="loadMyApplications()">📨 View My Applications</button>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="loadMyApplications()">📨 View My Applications</button>
+                    </div>
                     
                     <div id="myApplicationsResults"></div>
                 </div>
@@ -620,7 +838,9 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary" onclick="loadPropertyApplications()">📬 View Applications</button>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="loadPropertyApplications()">📬 View Applications</button>
+                    </div>
                     
                     <div id="propertyApplicationsResults"></div>
                 </div>
@@ -639,7 +859,9 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary" onclick="loadDashboardStats()">📊 Load Dashboard Stats</button>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="loadDashboardStats()">📊 Load Dashboard Stats</button>
+                    </div>
                     
                     <div id="dashboardStats"></div>
                 </div>
@@ -653,7 +875,9 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary" onclick="loadActivityLogs()">📝 Load Activity Logs</button>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="loadActivityLogs()">📝 Load Activity Logs</button>
+                    </div>
                     
                     <div id="activityLogsResults"></div>
                 </div>
@@ -665,9 +889,177 @@
         let currentToken = '';
         let currentUser = null;
         
-        // FIXED: Correct API URL for your local backend
-        const API_BASE = 'https://hyratryggt.se';
+        // UPDATED: Correct Railway API endpoint first!
+        const API_ENDPOINTS = [
+            'https://hyra-tryggt-backend-production-03c1.up.railway.app',
+            'https://hyra-tryggt-backend-production-03c1.up.railway.app/api',
+            
+            // Fallback alternatives:
+            'https://hyratryggt.se/api',
+            'https://api.hyratryggt.se',
+            'http://localhost:3000/api',
+            'http://localhost:8000/api',
+            'http://localhost:5000',
+            'http://localhost:4000',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:8000'
+        ];
+        
+        let currentAPIBase = API_ENDPOINTS[0]; // Start with Railway endpoint
+        
+        // Manual endpoint configuration
+        function setCustomEndpoint() {
+            const customURL = prompt('Enter your API endpoint URL:', currentAPIBase);
+            if (customURL && customURL.trim()) {
+                currentAPIBase = customURL.trim();
+                showConnectivityStatus('', `🔧 Endpoint updated to: ${currentAPIBase}`);
+                console.log('Custom endpoint set:', currentAPIBase);
+                
+                // Test the new endpoint
+                setTimeout(() => testConnectivity(), 1000);
+            }
+        }
+        
+        // Add comprehensive error handling and diagnostics
+        async function makeAPICall(url, options = {}) {
+            try {
+                console.log('Making API call to:', url);
+                
+                // Add timeout and better error handling
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal,
+                    mode: 'cors', // Explicitly set CORS mode
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                clearTimeout(timeoutId);
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                return response;
+            } catch (error) {
+                console.error('Detailed API call error:', {
+                    name: error.name,
+                    message: error.message,
+                    stack: error.stack
+                });
+                
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timeout - server took too long to respond');
+                } else if (error.message.includes('Failed to fetch')) {
+                    throw new Error('Cannot connect to server - check if backend is running and CORS is configured');
+                } else {
+                    throw new Error(`Network error: ${error.message}`);
+                }
+            }
+        }
+        
+        // Test API connectivity
+        async function testAPIConnectivity() {
+            console.log('Testing API connectivity...');
+            
+            for (let i = 0; i < API_ENDPOINTS.length; i++) {
+                const endpoint = API_ENDPOINTS[i];
+                try {
+                    console.log(`Testing endpoint ${i + 1}/${API_ENDPOINTS.length}: ${endpoint}`);
+                    
+                    // Try both /health and /properties endpoints, plus base URL
+                    const testUrls = [
+                        `${endpoint}/properties`, 
+                        `${endpoint}/health`, 
+                        `${endpoint}/api/properties`,
+                        endpoint
+                    ];
+                    
+                    for (const testUrl of testUrls) {
+                        try {
+                            const response = await fetch(testUrl, {
+                                method: 'GET',
+                                mode: 'cors',
+                                headers: { 'Accept': 'application/json' }
+                            });
+                            
+                            console.log(`Testing ${testUrl} - Status: ${response.status}`);
+                            
+                            if (response.ok || response.status === 404) { // 404 means server is running
+                                console.log(`✅ Working endpoint found: ${endpoint}`);
+                                currentAPIBase = endpoint;
+                                return endpoint;
+                            }
+                        } catch (e) {
+                            console.log(`Failed ${testUrl}:`, e.message);
+                        }
+                    }
+                } catch (error) {
+                    console.log(`❌ Endpoint ${endpoint} failed:`, error.message);
+                }
+            }
+            
+            console.log('❌ No working endpoints found');
+            return null;
+        }
+        
+        // Show connectivity status to user
+        function showConnectivityStatus(status, message) {
+            const statusElement = document.getElementById('connectivityStatus');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="result ${status}">
+                        <strong>Connection Status:</strong> ${message}
+                        <br><small>Current API: ${currentAPIBase}</small>
+                        <br><button class="btn btn-outline" onclick="setCustomEndpoint()" style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">⚙️ Set Custom Endpoint</button>
+                    </div>
+                `;
+            }
+        }
 
+        // UPDATED: Dual Range Slider functionality
+        function initializeRentSlider() {
+            const minSlider = document.getElementById('searchMinRent');
+            const maxSlider = document.getElementById('searchMaxRent');
+            const minValueDisplay = document.getElementById('minRentValue');
+            const maxValueDisplay = document.getElementById('maxRentValue');
+            const sliderRange = document.getElementById('sliderRange');
+            
+            function updateSliderValues() {
+                let minValue = parseInt(minSlider.value);
+                let maxValue = parseInt(maxSlider.value);
+                
+                // Ensure min is never greater than max
+                if (minValue > maxValue) {
+                    minValue = maxValue;
+                    minSlider.value = minValue;
+                }
+                
+                // Ensure max is never less than min
+                if (maxValue < minValue) {
+                    maxValue = minValue;
+                    maxSlider.value = maxValue;
+                }
+                
+                // Update displays
+                minValueDisplay.textContent = minValue.toLocaleString() + ' SEK';
+                maxValueDisplay.textContent = maxValue.toLocaleString() + ' SEK';
+                
+                // Update range track
+                const percent1 = (minValue / 50000) * 100;
+                const percent2 = (maxValue / 50000) * 100;
+                sliderRange.style.left = percent1 + '%';
+                sliderRange.style.width = (percent2 - percent1) + '%';
+            }
+            
+            minSlider.addEventListener('input', updateSliderValues);
+            maxSlider.addEventListener('input', updateSliderValues);
+            updateSliderValues(); // Initialize display
+        }
         
         // Tab Management
         function showTab(tabName) {
@@ -725,7 +1117,7 @@
             alert('👋 Successfully logged out!');
         }
 
-        // FIXED: Register form submission - CORRECT ENDPOINT
+        // FIXED: Register form submission with better error handling
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -737,10 +1129,8 @@
             };
 
             try {
-                // FIXED: Removed /auth/ prefix
-                const response = await fetch(`${API_BASE}/register`, {
+                const response = await makeAPICall(`${currentAPIBase}/register`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
@@ -753,11 +1143,12 @@
                     document.getElementById('registerForm').reset();
                 }
             } catch (error) {
-                showResult('authResult', { error: error.message }, false);
+                console.error('Registration error:', error);
+                showResult('authResult', { error: `Registration failed: ${error.message}` }, false);
             }
         });
 
-        // FIXED: Login form submission - CORRECT ENDPOINT
+        // FIXED: Login form submission with better error handling
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -767,10 +1158,8 @@
             };
 
             try {
-                // FIXED: Removed /auth/ prefix
-                const response = await fetch(`${API_BASE}/login`, {
+                const response = await makeAPICall(`${currentAPIBase}/login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
@@ -788,10 +1177,73 @@
                     alert(`❌ Login failed: ${result.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                showResult('authResult', { error: error.message }, false);
+                console.error('Login error:', error);
+                showResult('authResult', { error: `Login failed: ${error.message}` }, false);
                 alert(`❌ Login error: ${error.message}`);
             }
         });
+
+        // Test connectivity function for the button
+        async function testConnectivity() {
+            showConnectivityStatus('', '🔄 Testing all endpoints...');
+            const workingEndpoint = await testAPIConnectivity();
+            
+            if (workingEndpoint) {
+                showConnectivityStatus('success', `✅ Connected successfully!`);
+                // Try to load properties after successful connection
+                getAllProperties();
+            } else {
+                showConnectivityStatus('error', `❌ Cannot connect to any backend server. Please check if the server is running.`);
+            }
+        }
+        
+        // Load mock/demo data when backend is not available
+        function loadMockData() {
+            const mockProperties = [
+                {
+                    id: 1,
+                    title: "Beautiful 3-room apartment in Södermalm",
+                    address: "Götgatan 15",
+                    city: "Stockholm",
+                    rent: 18000,
+                    rooms: 3,
+                    size: 75,
+                    description: "Charming apartment with modern amenities in the heart of Stockholm. Close to restaurants, cafes, and public transport.",
+                    availableFrom: "2025-02-01",
+                    landlord: { name: "Anna Svensson", email: "anna@example.com", verified: true },
+                    _count: { applications: 3 }
+                },
+                {
+                    id: 2,
+                    title: "Modern 2-room in Göteborg Center",
+                    address: "Kungsgatan 45",
+                    city: "Göteborg",
+                    rent: 15000,
+                    rooms: 2,
+                    size: 60,
+                    description: "Newly renovated apartment with excellent location near central station.",
+                    availableFrom: "2025-01-15",
+                    landlord: { name: "Erik Johansson", email: "erik@example.com", verified: false },
+                    _count: { applications: 1 }
+                },
+                {
+                    id: 3,
+                    title: "Spacious 4-room house in Malmö",
+                    address: "Storgatan 23",
+                    city: "Malmö",
+                    rent: 22000,
+                    rooms: 4,
+                    size: 95,
+                    description: "Family-friendly house with garden and parking. Perfect for families with children.",
+                    availableFrom: "2025-03-01",
+                    landlord: { name: "Maria Andersson", email: "maria@example.com", verified: true },
+                    _count: { applications: 7 }
+                }
+            ];
+            
+            displayProperties(mockProperties, 'propertyResults');
+            showConnectivityStatus('', '📝 Demo data loaded (backend not connected)');
+        }
 
         // FIXED: Property form submission
         document.getElementById('propertyForm').addEventListener('submit', async (e) => {
@@ -835,17 +1287,19 @@
             }
         });
 
-        // FIXED: Search properties function - REMOVED /search
+        // FIXED: Search properties function with better error handling
         async function searchProperties() {
             const params = new URLSearchParams();
             
             const city = document.getElementById('searchCity').value;
+            const minRent = document.getElementById('searchMinRent').value;
             const maxRent = document.getElementById('searchMaxRent').value;
             const minRooms = document.getElementById('searchMinRooms').value;
             const maxRooms = document.getElementById('searchMaxRooms').value;
             
             if (city) params.append('city', city);
-            if (maxRent) params.append('maxRent', maxRent);
+            if (minRent && minRent !== '0') params.append('minRent', minRent);
+            if (maxRent && maxRent !== '50000') params.append('maxRent', maxRent);
             if (minRooms) params.append('minRooms', minRooms);
             if (maxRooms) params.append('maxRooms', maxRooms);
             
@@ -853,33 +1307,40 @@
             params.append('limit', 20);
 
             try {
-                // FIXED: Removed /search from endpoint
-                const response = await fetch(`${API_BASE}/properties?${params.toString()}`);
+                console.log('Searching properties with params:', params.toString());
+                const response = await makeAPICall(`${API_BASE}/properties?${params.toString()}`);
                 const result = await response.json();
                 
                 if (response.ok) {
+                    console.log('Search results:', result);
                     displayProperties(result.properties || result, 'propertyResults');
                 } else {
-                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                    console.error('Search error:', result);
+                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Search Error: ${result.error || 'Search failed'}</div>`;
                 }
             } catch (error) {
-                document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+                console.error('Search network error:', error);
+                document.getElementById('propertyResults').innerHTML = `<div class="result error">Connection Error: ${error.message}</div>`;
             }
         }
 
-        // FIXED: Get all properties
+        // FIXED: Get all properties with better error handling
         async function getAllProperties() {
             try {
-                const response = await fetch(`${API_BASE}/properties`);
+                console.log('Fetching all properties...');
+                const response = await makeAPICall(`${API_BASE}/properties`);
                 const result = await response.json();
                 
                 if (response.ok) {
+                    console.log('Properties loaded successfully:', result);
                     displayProperties(result.properties || result, 'propertyResults');
                 } else {
-                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${result.error}</div>`;
+                    console.error('API error:', result);
+                    document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${result.error || 'Failed to load properties'}</div>`;
                 }
             } catch (error) {
-                document.getElementById('propertyResults').innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+                console.error('Network error:', error);
+                document.getElementById('propertyResults').innerHTML = `<div class="result error">Connection Error: Unable to connect to server. Please check if the backend is running at ${API_BASE}</div>`;
             }
         }
 
@@ -928,11 +1389,13 @@
                     ${property.description ? `<p style="color: #666; margin: 15px 0;">${property.description}</p>` : ''}
                     
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                        ${currentToken ? 
-                            `<button class="btn btn-success" onclick="applyForProperty(${property.id})">📨 Apply Now</button>
-                             <button class="btn btn-outline" onclick="contactLandlord('${property.landlord.email}', '${property.title}')">💬 Contact</button>` : 
-                            `<button class="btn btn-warning" onclick="alert('Please login first to apply!')">🔓 Login to Apply</button>`
-                        }
+                        <div class="button-group">
+                            ${currentToken ? 
+                                `<button class="btn btn-success" onclick="applyForProperty(${property.id})">📨 Apply Now</button>
+                                 <button class="btn btn-outline" onclick="contactLandlord('${property.landlord.email}', '${property.title}')">💬 Contact</button>` : 
+                                `<button class="btn btn-warning" onclick="alert('Please login first to apply!')">🔓 Login to Apply</button>`
+                            }
+                        </div>
                         <small style="display: block; margin-top: 8px; color: #666;">
                             Available from: ${property.availableFrom ? new Date(property.availableFrom).toLocaleDateString() : 'Immediately'}
                             ${applicationCount > 0 ? ` • ${applicationCount} applications` : ''}
@@ -1135,7 +1598,9 @@
                     </div>
                     
                     ${application.status === 'PENDING' ? 
-                        `<button class="btn btn-outline" onclick="withdrawApplication(${application.id})">❌ Withdraw Application</button>` : ''
+                        `<div class="button-group">
+                            <button class="btn btn-outline" onclick="withdrawApplication(${application.id})">❌ Withdraw Application</button>
+                        </div>` : ''
                     }
                 `;
                 
@@ -1176,7 +1641,7 @@
                     </div>
                     
                     ${application.status === 'PENDING' ? `
-                        <div style="margin-top: 15px;">
+                        <div class="button-group">
                             <button class="btn btn-success" onclick="updateApplicationStatus(${application.id}, 'ACCEPTED')">✅ Accept</button>
                             <button class="btn btn-danger" onclick="updateApplicationStatus(${application.id}, 'REJECTED')">❌ Reject</button>
                         </div>
@@ -1333,10 +1798,18 @@ ${currentUser?.name || 'Potential Tenant'}`);
 
         function clearSearch() {
             document.getElementById('searchCity').value = '';
-            document.getElementById('searchMaxRent').value = '';
+            document.getElementById('searchMinRent').value = '0';
+            document.getElementById('searchMaxRent').value = '25000';
             document.getElementById('searchMinRooms').value = '';
             document.getElementById('searchMaxRooms').value = '';
             document.getElementById('propertyResults').innerHTML = '';
+            // Update slider display
+            document.getElementById('minRentValue').textContent = '0 SEK';
+            document.getElementById('maxRentValue').textContent = '25,000 SEK';
+            // Update range track
+            const sliderRange = document.getElementById('sliderRange');
+            sliderRange.style.left = '0%';
+            sliderRange.style.width = '50%';
         }
 
         function showResult(elementId, data, success) {
@@ -1348,14 +1821,15 @@ ${currentUser?.name || 'Potential Tenant'}`);
         // Initialize on page load
         window.addEventListener('load', function() {
             updateAuthUI();
+            initializeRentSlider();
             
             // Set default date for property availability
             const today = new Date();
             today.setDate(today.getDate() + 7); // Default to 1 week from now
             document.getElementById('propAvailableFrom').valueAsDate = today;
             
-            // Auto-load all properties on startup
-            getAllProperties();
+            // Test connectivity on startup
+            testConnectivity();
         });
     </script>
 </body>
