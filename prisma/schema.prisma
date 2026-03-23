@@ -18,11 +18,12 @@ model User {
   updatedAt    DateTime @updatedAt
   lastLoginAt  DateTime?
   
-  properties    Property[]
-  applications  Application[]
-  reviews       Review[]      @relation("UserReviews")
-  reviewsGiven  Review[]      @relation("ReviewAuthor")
-  activityLogs  ActivityLog[]
+  properties         Property[]
+  applications       Application[]
+  reviews            Review[]      @relation("UserReviews")
+  reviewsGiven       Review[]      @relation("ReviewAuthor")
+  activityLogs       ActivityLog[]
+  sentInvitations    PropertyInvitation[] @relation("SentInvitations")
   
   @@index([email])
   @@index([lastLoginAt])
@@ -51,6 +52,7 @@ model Property {
   images       PropertyImage[]
   reviews      Review[]
   activityLogs ActivityLog[]
+  invitations  PropertyInvitation[]
   
   @@index([landlordId])
   @@index([city])
@@ -139,9 +141,35 @@ model ActivityLog {
   @@map("activity_logs")
 }
 
+model PropertyInvitation {
+  id          Int              @id @default(autoincrement())
+  email       String
+  token       String           @unique @default(uuid())
+  status      InvitationStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  expiresAt   DateTime
+
+  propertyId  Int
+  invitedById Int
+
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  invitedBy   User     @relation("SentInvitations", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([token])
+  @@index([propertyId])
+  @@map("property_invitations")
+}
+
 enum ApplicationStatus {
   PENDING
   ACCEPTED
   REJECTED
   WITHDRAWN
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
 }

@@ -235,6 +235,7 @@ app.get('/', (req, res) => {
         properties: ['/properties', '/properties/:id', '/my-properties'],
         images: ['/properties/:id/images', '/images/:id'],
         applications: ['/applications', '/applications/:id', '/properties/:id/apply', '/my-applications'],
+        invitations: ['/properties/:id/invite', '/my-invitations'],
         analytics: ['/activity-logs', '/dashboard-stats']
       },
       serverInfo: {
@@ -1139,6 +1140,128 @@ app.put('/applications/:id/notes', authenticateToken, async (req, res) => {
   }
 });
 
+// Invite a tenant to a property
+app.post('/properties/:id/invite', authenticateToken, async (req, res) => {
+  try {
+    const propertyId = parseInt(req.params.id);
+    const { email } = req.body;
+
+    if (!email || !validateEmail(email)) {
+      return res.status(400).json({ error: 'A valid email address is required' });
+    }
+
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId },
+      include: { landlord: true }
+    });
+
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    if (property.landlordId !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to invite to this property' });
+    }
+
+    // Expire any previous pending invitation for the same email+property
+    await prisma.propertyInvitation.updateMany({
+      where: { propertyId, email: email.toLowerCase(), status: 'PENDING' },
+      data: { status: 'EXPIRED' }
+    });
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // invitation valid for 7 days
+
+    const invitation = await prisma.propertyInvitation.create({
+      data: {
+        email: email.toLowerCase(),
+        propertyId,
+        invitedById: req.user.userId,
+        expiresAt
+      },
+      include: {
+        property: {
+          select: { id: true, title: true, address: true, city: true, rent: true }
+        }
+      }
+    });
+
+    await logActivity(
+      req.user.userId,
+      'INVITE_TENANT',
+      `Invited ${email} to property: ${property.title}`,
+      { invitationId: invitation.id, invitedEmail: email },
+      propertyId
+    );
+
+    // Send invitation email if email is configured
+    if (emailTransporter) {
+      const emailSubject = `You have been invited to view ${property.title}`;
+      const emailBody = `
+        <h2>Property Invitation</h2>
+        <p>You have been invited by <strong>${property.landlord.name}</strong> to view a rental property.</p>
+        <p><strong>Property:</strong> ${property.title}</p>
+        <p><strong>Address:</strong> ${property.address}, ${property.city}</p>
+        <p><strong>Rent:</strong> ${property.rent} SEK/month</p>
+        <p>This invitation expires on ${expiresAt.toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric' })}.</p>
+      `;
+      await sendEmail(email, emailSubject, emailBody);
+    }
+
+    res.status(201).json({
+      message: 'Invitation sent successfully',
+      invitation
+    });
+
+  } catch (error) {
+    console.error('Invite tenant error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// Get properties the authenticated user has been invited to
+app.get('/my-invitations', authenticateToken, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: { email: true }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Mark expired invitations
+    await prisma.propertyInvitation.updateMany({
+      where: {
+        email: user.email,
+        status: 'PENDING',
+        expiresAt: { lt: new Date() }
+      },
+      data: { status: 'EXPIRED' }
+    });
+
+    const invitations = await prisma.propertyInvitation.findMany({
+      where: { email: user.email },
+      include: {
+        property: {
+          include: {
+            landlord: { select: { id: true, name: true, email: true, phone: true } },
+            images: { where: { isPrimary: true }, take: 1 }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(invitations);
+
+  } catch (error) {
+    console.error('Get my invitations error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
 // Add a catch-all route for debugging
 app.use('*', (req, res) => {
   console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
@@ -1159,8 +1282,10 @@ app.use('*', (req, res) => {
       'POST /properties/:id/images',
       'GET /properties/:id/images',
       'POST /properties/:id/apply',
+      'POST /properties/:id/invite',
       'GET /my-applications',
       'GET /my-property-applications',
+      'GET /my-invitations',
       'GET /activity-logs',
       'GET /dashboard-stats',
       'PUT /properties/:id/notes',
